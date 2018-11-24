@@ -17,6 +17,9 @@
     "require": {
         "simplito/elliptic-php": "^1.0",
         "spomky-labs/base64url": "^2.0",
+        "ext-gmp": "*",
+        "ext-openssl": "*",
+        "ext-json": "*",
         "guzzlehttp/guzzle": "^6.3",
         "web-token/jwt-framework": "^1.2"
     },
