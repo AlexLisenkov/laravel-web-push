@@ -1,7 +1,7 @@
 {
     "name": "alexlisenkov/laravel-web-push",
     "description": "Send push notifications from your backend via the Web Push Protocol",
-    "type": "laravel library",
+    "type": "Library",
     "license": "MIT",
     "authors": [
         {
