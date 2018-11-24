@@ -1,10 +1,10 @@
 # Send Push Notification in Laravel
-[![downloads](https://img.shields.io/packagist/dt/alexlisenkov/laravel-web-push.svg?style=flat-square)](https://packagist.org/packages/alexlisenkov/laravel-web-push)
+[![Total Downloads](https://poser.pugx.org/alexlisenkov/laravel-web-push/downloads)](https://packagist.org/packages/alexlisenkov/laravel-web-push)
 [![Scrutinizer Code Quality](https://scrutinizer-ci.com/g/AlexLisenkov/laravel-web-push/badges/quality-score.png?b=master)](https://scrutinizer-ci.com/g/AlexLisenkov/laravel-web-push/?branch=master)
 [![Code Coverage](https://scrutinizer-ci.com/g/AlexLisenkov/laravel-web-push/badges/coverage.png?b=master)](https://scrutinizer-ci.com/g/AlexLisenkov/laravel-web-push/?branch=master)
 [![build](https://travis-ci.org/AlexLisenkov/laravel-web-push.svg?branch=master)](https://travis-ci.org/AlexLisenkov/laravel-web-push)
 
-![https://developers.google.com/web/fundamentals/push-notifications/web-push-protocol](https://developers.google.com/web/fundamentals/push-notifications/images/svgs/server-to-push-service.svg)
+[![More info](https://developers.google.com/web/fundamentals/push-notifications/images/svgs/server-to-push-service.svg)](https://developers.google.com/web/fundamentals/push-notifications/web-push-protocol)
 
 The `alexlisenkov/laravel-web-push` package is a package to send push notifications.
 This package offers you to send notifications quickly by creating your message and subscriptions.
@@ -112,3 +112,4 @@ $subscription->sendMessage($message);
 - Messages should be able to implement `ShouldQueue` to send messages to queue
 - `PushMessage` is missing the [actions](https://developer.mozilla.org/en-US/docs/Web/API/ServiceWorkerRegistration/showNotification#Parameters) value, this should be added
 - Create more docs on how to use and install
+- Create exceptions for missing configuration variables
