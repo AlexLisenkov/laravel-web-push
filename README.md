@@ -11,7 +11,7 @@ This package offers you to send notifications quickly by creating your message a
 
 If you are new to the Web Push Protocol please [read about the fundamentals](https://developers.google.com/web/fundamentals/push-notifications/web-push-protocol).
 
-##Installation
+## Installation
 
 ```bash
 composer require alexlisenkov/laravel-web-push
@@ -21,7 +21,7 @@ composer require alexlisenkov/laravel-web-push
 php artisan vendor:publish --provider="AlexLisenkov\LaravelWebPush\LaravelWebPushServiceProvider"
 ```
 
-##Configuration
+## Configuration
 To send out Web Push notifications you need to generate yourself an identity.
 The simplest thing to do is to visit [https://web-push-codelab.glitch.me](https://web-push-codelab.glitch.me/)
 
@@ -45,9 +45,9 @@ return [
 ];
 ```
 
-#Sending a Web Push
+# Sending a Web Push
 
-##Creating a message
+## Creating a message
 A message can be created by creating a new class that extends the `AlexLisenkov\LaravelWebPush\PushMessage` class.
 Please see [this MDN doc](https://developer.mozilla.org/en-US/docs/Web/API/ServiceWorkerRegistration/showNotification#Parameters) to see all available options.
 ```php
@@ -68,7 +68,7 @@ class ExampleMessage extends PushMessage
 
 ```
 
-##Creating a subscription
+## Creating a subscription
 The `AlexLisenkov\LaravelWebPush\PushSubscription` is used to create a new subscription. 
 If you rather want to use your own class you can implement the `AlexLisenlov\LaravelWebPush\Contracts\PushSubscriptionContract`.
 
@@ -83,7 +83,7 @@ new PushSubscription(
     );
 ```
 
-##Sending a notification
+## Sending a notification
 Now that we have a subscriber and a message, we can send it out.
 
 ```php
@@ -107,7 +107,7 @@ $message->sendTo($subscription);
 $subscription->sendMessage($message);
 ```
 
-#TODO:
+# TODO:
 - Create a `SendsMessages` trait to use in combination with the `PushSubscriptionContract`
 - Messages should be able to implement `ShouldQueue` to send messages to queue
 - `PushMessage` is missing the [actions](https://developer.mozilla.org/en-US/docs/Web/API/ServiceWorkerRegistration/showNotification#Parameters) value, this should be added
