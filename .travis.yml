@@ -13,4 +13,4 @@ script:
 
 
 after_success:
-  - php vendor/bin/ocular code-coverage:upload --format=php-clover coverage.clover
+  - bash <(curl -s https://codecov.io/bash)
