@@ -7,8 +7,6 @@ use AlexLisenkov\LaravelWebPush\Contracts\P256EncryptedMessageBuilderContract;
 use AlexLisenkov\LaravelWebPush\Contracts\P256EncryptedMessageContract;
 use AlexLisenkov\LaravelWebPush\Contracts\WebPushContract;
 use Elliptic\EC;
-use GuzzleHttp\Client;
-use GuzzleHttp\ClientInterface;
 use Illuminate\Support\ServiceProvider;
 
 class LaravelWebPushServiceProvider extends ServiceProvider

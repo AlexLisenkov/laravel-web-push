@@ -1,4 +1,5 @@
 <?php
+
 namespace AlexLisenkov\LaravelWebPush;
 
 use AlexLisenkov\LaravelWebPush\Contracts\JWTGeneratorContract;
@@ -17,7 +18,7 @@ class JWTGenerator implements JWTGeneratorContract
     /**
      * @var int
      */
-    private $expires_as;
+    private $expires_at;
     /**
      * @var string
      */
@@ -30,17 +31,6 @@ class JWTGenerator implements JWTGeneratorContract
     public function __construct(ConfigRepository $config_repository)
     {
         $this->config_repository = $config_repository;
-    }
-
-    /**
-     * @return array
-     */
-    public function getHeader(): array
-    {
-        return [
-            'typ' => 'JWT',
-            'alg' => 'ES256',
-        ];
     }
 
     /**
@@ -62,19 +52,7 @@ class JWTGenerator implements JWTGeneratorContract
      */
     public function willExpireAt(int $time): JWTGeneratorContract
     {
-        $this->expires_as = $time;
-
-        return $this;
-    }
-
-    /**
-     * @param int $time
-     *
-     * @return JWTGeneratorContract
-     */
-    public function willExpireIn(int $time): JWTGeneratorContract
-    {
-        $this->expires_as = time()+$time;
+        $this->expires_at = $time;
 
         return $this;
     }
@@ -83,38 +61,12 @@ class JWTGenerator implements JWTGeneratorContract
      * @return string
      * @throws \Exception
      */
-    public function getPayload(): string
+    public function serialize(): string
     {
-        if( !$this->audience ){
-            throw new \Exception('No audience set');
-        }
+        $jsonConverter = new StandardConverter();
+        $jwsCompactSerializer = new CompactSerializer($jsonConverter);
 
-        if( !$this->expires_as ){
-            $this->willExpireIn($this->getConfigVariable('expiration', Constants::DEFAULT_EXPIRE));
-        }
-
-        return json_encode([
-            'aud' => $this->audience,
-            'exp' => $this->expires_as,
-            'sub' => $this->getConfigVariable('subject', env('APP_URL', 'mailto:name@example.com'))
-        ], JSON_UNESCAPED_SLASHES | JSON_NUMERIC_CHECK);
-    }
-
-    /**
-     * @return JWK
-     */
-    public function getJWK(): JWK
-    {
-        $local_server_key = Base64Url::decode($this->getConfigVariable('public_key'));
-        $public = $this->unserializePublicKey($local_server_key);
-
-        return JWK::create([
-            'kty' => 'EC',
-            'crv' => 'P-256',
-            'x' => Base64Url::encode(hex2bin($public['x'])),
-            'y' => Base64Url::encode(hex2bin($public['y'])),
-            'd' => $this->getConfigVariable('private_key'),
-        ]);
+        return $jwsCompactSerializer->serialize($this->getJWS(), 0);
     }
 
     /**
@@ -137,12 +89,62 @@ class JWTGenerator implements JWTGeneratorContract
      * @return string
      * @throws \Exception
      */
-    public function serialize(): string
+    public function getPayload(): string
     {
-        $jsonConverter = new StandardConverter();
-        $jwsCompactSerializer = new CompactSerializer($jsonConverter);
+        if (!$this->audience) {
+            throw new \Exception('No audience set');
+        }
 
-        return $jwsCompactSerializer->serialize($this->getJWS(), 0);
+        if (!$this->getExpiresAt()) {
+            $this->willExpireIn($this->getConfigVariable('expiration', Constants::DEFAULT_EXPIRE));
+        }
+
+        return json_encode([
+            'aud' => $this->audience,
+            'exp' => $this->getExpiresAt(),
+            'sub' => $this->getConfigVariable('subject', env('APP_URL', 'mailto:name@example.com')),
+        ], JSON_UNESCAPED_SLASHES | JSON_NUMERIC_CHECK);
+    }
+
+    /**
+     * @param int $time
+     *
+     * @return JWTGeneratorContract
+     */
+    public function willExpireIn(int $time): JWTGeneratorContract
+    {
+        $this->expires_at = time() + $time;
+
+        return $this;
+    }
+
+    /**
+     * @param string $key
+     *
+     * @param $default
+     *
+     * @return mixed
+     */
+    private function getConfigVariable(string $key, $default = null)
+    {
+        return $this->config_repository->get(Constants::CONFIG_KEY . '.' . $key, $default);
+    }
+
+    /**
+     * @return JWK
+     */
+    public function getJWK(): JWK
+    {
+        $local_server_key = Base64Url::decode($this->getConfigVariable('public_key'));
+        $public = $this->unserializePublicKey($local_server_key);
+
+        return JWK::create([
+            'kty' => 'EC',
+            'crv' => 'P-256',
+            'x' => Base64Url::encode(hex2bin($public['x'])),
+            'y' => Base64Url::encode(hex2bin($public['y'])),
+            'd' => $this->getConfigVariable('private_key'),
+        ]);
     }
 
     /**
@@ -166,14 +168,23 @@ class JWTGenerator implements JWTGeneratorContract
     }
 
     /**
-     * @param string $key
-     *
-     * @param $default
-     *
-     * @return mixed
+     * @return array
      */
-    private function getConfigVariable(string $key, $default = null)
+    public function getHeader(): array
     {
-        return $this->config_repository->get(Constants::CONFIG_KEY.'.'.$key, $default);
+        return [
+            'typ' => 'JWT',
+            'alg' => 'ES256',
+        ];
+    }
+
+    /**
+     * Get ExpiresAt
+     *
+     * @return int|null
+     */
+    public function getExpiresAt(): ?int
+    {
+        return $this->expires_at;
     }
 }

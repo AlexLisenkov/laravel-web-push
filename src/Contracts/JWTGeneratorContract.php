@@ -54,4 +54,9 @@ interface JWTGeneratorContract
      * @throws \Exception
      */
     public function serialize(): string;
+
+    /**
+     * @return int|null
+     */
+    public function getExpiresAt(): ?int;
 }

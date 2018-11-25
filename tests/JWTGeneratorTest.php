@@ -186,6 +186,51 @@ namespace AlexLisenkov\LaravelWebPush\Tests {
             $this->assertSame(1, $this->subject->getJWS()->countSignatures());
         }
 
+        public function testThatGetPayloadWithoutAudienceSetWillThrowException()
+        {
+            $this->expectException(\Exception::class);
+
+            $this->subject->getPayload();
+        }
+
+        public function testThatGetJwkWithInvalidPublicKeyWillThrowException()
+        {
+            $this->expectException(\InvalidArgumentException::class);
+
+            $this->config_repository
+                ->method('get')
+                ->willReturnOnConsecutiveCalls(
+                    'invalid data'
+                );
+
+            $this->subject->getJWK();
+        }
+
+        public function testWillExpireAt()
+        {
+            $this->subject->willExpireAt(12345);
+
+            $this->assertEquals(12345, $this->subject->getExpiresAt());
+        }
+
+        public function testSerialize()
+        {
+            $this->subject->withAudience('test');
+            $this->subject->willExpireIn(12);
+
+            $this->config_repository
+                ->method('get')
+                ->willReturnOnConsecutiveCalls(
+                    'subject',
+                    'BBp2ZSrnNp5GLBbBvu9kXPzKXgcSo8XyZXNLjBBuXky-IpzCZSSLyfhTKLPpo3UnlF6UBWgjzrg_cs3f6AqVTD4',
+                    'WnThrKeXC_D00FRSITmGAvXGNHlIm3n4zqsvIHIOGMw'
+                );
+
+            $res = $this->subject->serialize();
+
+            $this->assertEquals(179, strlen($res));
+        }
+
         protected function getPackageProviders($app)
         {
             return ['AlexLisenkov\LaravelWebPush\LaravelWebPushServiceProvider'];
