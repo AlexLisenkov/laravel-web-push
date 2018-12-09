@@ -149,7 +149,7 @@ class WebPush implements WebPushContract
             return false;
         };
 
-        return mb_strlen($public_key_decoded, '8bit') === 32;
+        return mb_strlen($public_key_decoded, '8bit') === 65;
     }
 
 }
