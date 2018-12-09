@@ -59,7 +59,6 @@ class WebPush implements WebPushContract
         PushSubscriptionContract $push_subscription
     ): PromiseInterface {
         $private = $this->getConfigVariable('private_key');
-
         if (!$this->assertPrivateKeyIsCorrect($private)) {
             throw new InvalidPrivateKeyException('Configured private key is incorrect');
         }
@@ -126,7 +125,13 @@ class WebPush implements WebPushContract
      */
     private function assertPrivateKeyIsCorrect($private): bool
     {
-        return $private !== null && is_string($private) && mb_strlen(Base64Url::decode($private), '8bit') === 32;
+        try {
+            $private_key_decoded = Base64Url::decode($private);
+        } catch (\InvalidArgumentException $exception) {
+            return false;
+        };
+
+        return mb_strlen($private_key_decoded, '8bit') === 32;
     }
 
     /**
@@ -138,7 +143,13 @@ class WebPush implements WebPushContract
      */
     private function assertPublicKeyIsCorrect($public): bool
     {
-        return $public !== null && is_string($public) && mb_strlen(Base64Url::decode($public), '8bit') === 65;
+        try {
+            $public_key_decoded = Base64Url::decode($public);
+        } catch (\InvalidArgumentException $exception) {
+            return false;
+        };
+
+        return mb_strlen($public_key_decoded, '8bit') === 32;
     }
 
 }
