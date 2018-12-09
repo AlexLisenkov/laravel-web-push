@@ -22,7 +22,7 @@ class LaravelWebPushServiceProvider extends ServiceProvider
         $this->app->bind(P256EncryptedMessageBuilderContract::class, P256EncryptedMessageBuilder::class);
         $this->app->bind(P256EncryptedMessageContract::class, P256EncryptedMessage::class);
         $this->app->bind(JWTGeneratorContract::class, JWTGenerator::class);
-        $this->app->bind(EC::class, function () {
+        $this->app->bind(EC::class, function() {
             return new EC('p256');
         });
 

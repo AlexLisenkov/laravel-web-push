@@ -7,8 +7,10 @@ use AlexLisenkov\LaravelWebPush\Contracts\P256EncryptedMessageBuilderContract;
 use AlexLisenkov\LaravelWebPush\Contracts\PushMessageContract;
 use AlexLisenkov\LaravelWebPush\Contracts\PushSubscriptionContract;
 use AlexLisenkov\LaravelWebPush\Contracts\WebPushContract;
+use AlexLisenkov\LaravelWebPush\Exceptions\InvalidPrivateKeyException;
+use AlexLisenkov\LaravelWebPush\Exceptions\InvalidPublicKeyException;
+use Base64Url\Base64Url;
 use GuzzleHttp\Client;
-use GuzzleHttp\ClientInterface;
 use GuzzleHttp\Promise\PromiseInterface;
 use GuzzleHttp\Psr7\Request;
 use Illuminate\Contracts\Config\Repository as ConfigRepository;
@@ -56,6 +58,20 @@ class WebPush implements WebPushContract
         PushMessageContract $message,
         PushSubscriptionContract $push_subscription
     ): PromiseInterface {
+        $private = $this->getConfigVariable('private_key');
+        if (!$this->assertPrivateKeyIsCorrect($private)) {
+            throw new InvalidPrivateKeyException('Configured private key is incorrect');
+        }
+
+        $public = $this->getConfigVariable('public_key');
+        if (!$this->assertPublicKeyIsCorrect($public)) {
+            throw new InvalidPublicKeyException('Configured public key is incorrect');
+        }
+
+        if (!$this->assertPublicKeyIsCorrect($push_subscription->getP256dh())) {
+            throw new InvalidPublicKeyException('Subscriber public key is invalid');
+        }
+
         $encryptedMessage = $this->encrypted_message_builder
             ->withPublicKey($push_subscription->getP256dh())
             ->withAuthToken($push_subscription->getAuth())
@@ -98,6 +114,42 @@ class WebPush implements WebPushContract
     private function getConfigVariable(string $key, $default = null)
     {
         return $this->config_repository->get(Constants::CONFIG_KEY . '.' . $key, $default);
+    }
+
+    /**
+     * Assert that the given private key is correct by size
+     *
+     * @param $private
+     *
+     * @return bool
+     */
+    private function assertPrivateKeyIsCorrect($private): bool
+    {
+        try {
+            $private_key_decoded = Base64Url::decode($private);
+        } catch (\InvalidArgumentException $exception) {
+            return false;
+        };
+
+        return mb_strlen($private_key_decoded, '8bit') === 32;
+    }
+
+    /**
+     * Assert that the given public key is correct by size
+     *
+     * @param $public
+     *
+     * @return bool
+     */
+    private function assertPublicKeyIsCorrect($public): bool
+    {
+        try {
+            $public_key_decoded = Base64Url::decode($public);
+        } catch (\InvalidArgumentException $exception) {
+            return false;
+        };
+
+        return mb_strlen($public_key_decoded, '8bit') === 65;
     }
 
 }

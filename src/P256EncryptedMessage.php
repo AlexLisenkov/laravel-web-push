@@ -94,10 +94,10 @@ class P256EncryptedMessage implements P256EncryptedMessageContract
      */
     private function padPayload($payload): string
     {
-        $payloadLen = mb_strlen($payload, '8bit');
-        $padLen = 3052 - $payloadLen;
+        $payload_length = mb_strlen($payload, '8bit');
+        $pad_length = Constants::PADDED_PAYLOAD_LENGTH - $payload_length;
 
-        return pack('n*', $padLen) . str_pad($payload, $padLen + $payloadLen, chr(0), STR_PAD_LEFT);
+        return pack('n*', $pad_length) . str_pad($payload, Constants::PADDED_PAYLOAD_LENGTH, "\x00", STR_PAD_LEFT);
     }
 
     /**
@@ -107,7 +107,7 @@ class P256EncryptedMessage implements P256EncryptedMessageContract
      */
     public function getContentEncryptionKey(): string
     {
-        $keyLabelInfo = 'Content-Encoding: aesgcm' . chr(0) . 'P-256' . $this->getContext();
+        $keyLabelInfo = "Content-Encoding: aesgcm\x00P-256" . $this->getContext();
 
         return $this->hkdf($this->salt, $this->getPseudoRandomKey(), $keyLabelInfo, 16);
     }
@@ -118,9 +118,9 @@ class P256EncryptedMessage implements P256EncryptedMessageContract
      */
     public function getContext(): string
     {
-        $len = chr(0) . 'A';
+        $len = "\x00A";
 
-        return chr(0) . $len . $this->getSubscriberPublicKey() . $len . $this->getPublicKey();
+        return "\x00" . $len . $this->getSubscriberPublicKey() . $len . $this->getPublicKey();
     }
 
     /**
@@ -164,7 +164,7 @@ class P256EncryptedMessage implements P256EncryptedMessageContract
      */
     public function getPseudoRandomKey(): string
     {
-        $info = 'Content-Encoding: auth' . chr(0);
+        $info = "Content-Encoding: auth\x00";
 
         return $this->hkdf($this->auth_token, $this->getSharedSecret(), $info, 32);
     }
@@ -186,7 +186,7 @@ class P256EncryptedMessage implements P256EncryptedMessageContract
      */
     public function getNonce(): string
     {
-        $nonceEncInfo = 'Content-Encoding: nonce' . chr(0) . 'P-256' . $this->getContext();
+        $nonceEncInfo = "Content-Encoding: nonce\x00P-256" . $this->getContext();
 
         return $this->hkdf($this->salt, $this->getPseudoRandomKey(), $nonceEncInfo, 12);
     }
