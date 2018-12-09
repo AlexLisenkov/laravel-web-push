@@ -87,12 +87,12 @@ class JWTGenerator implements JWTGeneratorContract
 
     /**
      * @return string
-     * @throws \Exception
+     * @throws \InvalidArgumentException
      */
     public function getPayload(): string
     {
-        if (!$this->audience) {
-            throw new \Exception('No audience set');
+        if (!is_string($this->audience)) {
+            throw new \InvalidArgumentException("Audience must be string, " . gettype($this->audience) . " given.");
         }
 
         if (!$this->getExpiresAt()) {
@@ -104,6 +104,16 @@ class JWTGenerator implements JWTGeneratorContract
             'exp' => $this->getExpiresAt(),
             'sub' => $this->getConfigVariable('subject', env('APP_URL', 'mailto:name@example.com')),
         ], JSON_UNESCAPED_SLASHES | JSON_NUMERIC_CHECK);
+    }
+
+    /**
+     * Get ExpiresAt
+     *
+     * @return int|null
+     */
+    public function getExpiresAt(): ?int
+    {
+        return $this->expires_at;
     }
 
     /**
@@ -141,8 +151,8 @@ class JWTGenerator implements JWTGeneratorContract
         return JWK::create([
             'kty' => 'EC',
             'crv' => 'P-256',
-            'x' => Base64Url::encode(hex2bin($public['x'])),
-            'y' => Base64Url::encode(hex2bin($public['y'])),
+            'x' => Base64Url::encode($public['x']),
+            'y' => Base64Url::encode($public['y']),
             'd' => $this->getConfigVariable('private_key'),
         ]);
     }
@@ -154,16 +164,18 @@ class JWTGenerator implements JWTGeneratorContract
      */
     private function unserializePublicKey(string $data): array
     {
-        $data = bin2hex($data);
-        if (mb_substr($data, 0, 2, '8bit') !== '04') {
+        $first_byte = mb_strcut($data, 0, 1);
+
+        if ($first_byte !== "\x04") {
             throw new \InvalidArgumentException('Invalid data: only uncompressed keys are supported.');
         }
-        $data = mb_substr($data, 2, null, '8bit');
-        $dataLength = mb_strlen($data, '8bit');
+
+        $data = mb_strcut($data, 1);
+        $center = mb_strlen($data) / 2;
 
         return [
-            'x' => mb_substr($data, 0, $dataLength / 2, '8bit'),
-            'y' => mb_substr($data, $dataLength / 2, null, '8bit'),
+            'x' => mb_strcut($data, 0, $center),
+            'y' => mb_strcut($data, $center),
         ];
     }
 
@@ -176,15 +188,5 @@ class JWTGenerator implements JWTGeneratorContract
             'typ' => 'JWT',
             'alg' => 'ES256',
         ];
-    }
-
-    /**
-     * Get ExpiresAt
-     *
-     * @return int|null
-     */
-    public function getExpiresAt(): ?int
-    {
-        return $this->expires_at;
     }
 }

@@ -114,7 +114,7 @@ namespace AlexLisenkov\LaravelWebPush\Tests {
 
         public function testThatGetJwkXWillBeFirstPartOfPublicKey()
         {
-            $expected = 'GnZlKuc2nkYsFsG-72Rc_MpeBxKjxfJlc0uMEG5eTL4';
+            $expected = 'GnZlKuc2nkYsFsG-72Rc_MpeBxKjxfJlcw';
 
             $this->config_repository
                 ->method('get')
@@ -128,7 +128,7 @@ namespace AlexLisenkov\LaravelWebPush\Tests {
 
         public function testThatGetJwkYWillBeFirstPartOfPublicKey()
         {
-            $expected = 'IpzCZSSLyfhTKLPpo3UnlF6UBWgjzrg_cs3f6AqVTD4';
+            $expected = 'S4wQbl5MviKcwmUki8n4Uyiz6aN1J5RelAVoI864P3LN3-gKlUw-';
 
             $this->config_repository
                 ->method('get')

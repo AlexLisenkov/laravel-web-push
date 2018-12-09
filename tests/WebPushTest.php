@@ -7,6 +7,8 @@ use AlexLisenkov\LaravelWebPush\Contracts\P256EncryptedMessageBuilderContract;
 use AlexLisenkov\LaravelWebPush\Contracts\P256EncryptedMessageContract;
 use AlexLisenkov\LaravelWebPush\Contracts\PushMessageContract;
 use AlexLisenkov\LaravelWebPush\Contracts\PushSubscriptionContract;
+use AlexLisenkov\LaravelWebPush\Exceptions\InvalidPrivateKeyException;
+use AlexLisenkov\LaravelWebPush\Exceptions\InvalidPublicKeyException;
 use GuzzleHttp\Client;
 use GuzzleHttp\ClientInterface;
 use GuzzleHttp\Promise\PromiseInterface;
@@ -52,8 +54,10 @@ class WebPushTest extends TestCase
 
     public function testSendMessageBuildsEncryptedMessageFromSubscription()
     {
-        $p256 = '123456789';
-        $this->subscription->expects($this->once())
+        $this->setGetConfigVariableMock();
+
+        $p256 = 'BBp2ZSrnNp5GLBbBvu9kXPzKXgcSo8XyZXNLjBBuXky-IpzCZSSLyfhTKLPpo3UnlF6UBWgjzrg_cs3f6AqVTD4';
+        $this->subscription->expects($this->exactly(2))
                            ->method('getP256dh')
                            ->willReturn($p256);
 
@@ -89,8 +93,23 @@ class WebPushTest extends TestCase
         $this->subject->sendMessage($this->message, $this->subscription);
     }
 
+    private function setGetConfigVariableMock(array $with = [])
+    {
+        $this->config_repository
+            ->method('get')
+            ->will($this->returnValueMap(array_merge([
+                [Constants::CONFIG_KEY . '.' . 'private_key', null, 'RofDYZ1GFp-oPDdvXVKN29yl1xKfJUPjTWYKQkcUuJU'],
+                [
+                    Constants::CONFIG_KEY . '.' . 'public_key',
+                    null,
+                    'BBp2ZSrnNp5GLBbBvu9kXPzKXgcSo8XyZXNLjBBuXky-IpzCZSSLyfhTKLPpo3UnlF6UBWgjzrg_cs3f6AqVTD4',
+                ],
+            ], $with)));
+    }
+
     public function testSendMessageJWTGeneratorWillUseAudienceFromSubscription()
     {
+        $this->setGetConfigVariableMock();
         $this->setEncryptedMessageBuilderMocks();
 
         $audience = 'https://example.net';
@@ -117,7 +136,8 @@ class WebPushTest extends TestCase
 
     private function setEncryptedMessageBuilderMocks()
     {
-        $p256 = '123456789';
+        $this->setGetConfigVariableMock();
+        $p256 = 'BBp2ZSrnNp5GLBbBvu9kXPzKXgcSo8XyZXNLjBBuXky-IpzCZSSLyfhTKLPpo3UnlF6UBWgjzrg_cs3f6AqVTD4';
         $this->subscription
             ->method('getP256dh')
             ->willReturn($p256);
@@ -147,6 +167,7 @@ class WebPushTest extends TestCase
 
     public function testThatRequestMethodIsPost()
     {
+        $this->setGetConfigVariableMock();
         $this->setEncryptedMessageBuilderMocks();
         $this->setJWTGeneratorMocks();
 
@@ -182,6 +203,7 @@ class WebPushTest extends TestCase
     {
         $endpoint = 'https://example.net/endpoint';
 
+        $this->setGetConfigVariableMock();
         $this->setEncryptedMessageBuilderMocks();
         $this->setJWTGeneratorMocks();
 
@@ -206,6 +228,7 @@ class WebPushTest extends TestCase
     {
         $cypher = '1234459696959592373737';
 
+        $this->setGetConfigVariableMock();
         $this->setEncryptedMessageBuilderMocks();
         $this->setJWTGeneratorMocks();
 
@@ -228,6 +251,7 @@ class WebPushTest extends TestCase
 
     public function testThatRequestContentTypeHeaderIsApplicationOctetStream()
     {
+        $this->setGetConfigVariableMock();
         $this->setEncryptedMessageBuilderMocks();
         $this->setJWTGeneratorMocks();
 
@@ -245,6 +269,7 @@ class WebPushTest extends TestCase
 
     public function testThatRequestContentEncodingHeaderIsAesgcm()
     {
+        $this->setGetConfigVariableMock();
         $this->setEncryptedMessageBuilderMocks();
         $this->setJWTGeneratorMocks();
 
@@ -262,6 +287,7 @@ class WebPushTest extends TestCase
 
     public function testThatRequestAuthorizationHeaderIsWebpushWithJWT()
     {
+        $this->setGetConfigVariableMock();
         $this->setEncryptedMessageBuilderMocks();
         $this->setJWTGeneratorMocks();
 
@@ -281,6 +307,7 @@ class WebPushTest extends TestCase
     {
         $expected = 'Salted potato chips';
 
+        $this->setGetConfigVariableMock();
         $this->setEncryptedMessageBuilderMocks();
         $this->setJWTGeneratorMocks();
 
@@ -303,9 +330,10 @@ class WebPushTest extends TestCase
 
     public function testThatRequestCryptoKeyHeaderIsEncodedPublicKeyAndPublicKey()
     {
-        $expected_message_pub_key = 'Some key';
-        $expected_config_pub_key = 'Some other key';
+        $expected_message_pub_key = 'BBp2ZSrnNp5GLBbBvu9kXPzKXgcSo8XyZXNLjBBuXky-IpzCZSSLyfhTKLPpo3UnlF6UBWgjzrg_cs3f6AqVTD4';
+        $expected_config_pub_key = 'BBp2ZSrnNp5GLBbBvu9kXPzKXgcSo8XyZXNLjBBuXky-IpzCZSSLyfhTKLPpo3UnlF6UBWgjzrg_cs3f6AqVTD4';
 
+        $this->setGetConfigVariableMock();
         $this->setEncryptedMessageBuilderMocks();
         $this->setJWTGeneratorMocks();
 
@@ -326,6 +354,7 @@ class WebPushTest extends TestCase
             ) {
                 $this->assertEquals('dh=' . $expected_message_pub_key . ';p256ecdsa=' . $expected_config_pub_key,
                     $request->getHeaderLine('Crypto-Key'));
+
                 return true;
             }))
             ->willReturn($this->createMock(PromiseInterface::class));
@@ -337,6 +366,7 @@ class WebPushTest extends TestCase
     {
         $expected = 12345;
 
+        $this->setGetConfigVariableMock();
         $this->setEncryptedMessageBuilderMocks();
         $this->setJWTGeneratorMocks();
 
@@ -361,12 +391,12 @@ class WebPushTest extends TestCase
     {
         $expected = 50000;
 
+        $this->setGetConfigVariableMock([
+            [Constants::CONFIG_KEY . '.TTL', Constants::DEFAULT_TTL, $expected],
+        ]);
         $this->setEncryptedMessageBuilderMocks();
         $this->setJWTGeneratorMocks();
 
-        $this->config_repository
-            ->method('get')
-            ->willReturn($expected);
         $this->client
             ->method('sendAsync')
             ->with($this->callback(function (Request $request) use ($expected) {
@@ -383,6 +413,7 @@ class WebPushTest extends TestCase
     {
         $expected = 'topic';
 
+        $this->setGetConfigVariableMock();
         $this->setEncryptedMessageBuilderMocks();
         $this->setJWTGeneratorMocks();
 
@@ -407,6 +438,7 @@ class WebPushTest extends TestCase
     {
         $expected = 'high';
 
+        $this->setGetConfigVariableMock();
         $this->setEncryptedMessageBuilderMocks();
         $this->setJWTGeneratorMocks();
 
@@ -423,6 +455,38 @@ class WebPushTest extends TestCase
                 return true;
             }))
             ->willReturn($this->createMock(PromiseInterface::class));
+
+        $this->subject->sendMessage($this->message, $this->subscription);
+    }
+
+    public function testThatIncorrectPrivateKeyWillThrowException()
+    {
+        $this->config_repository
+            ->method('get')
+            ->will($this->returnValueMap(array_merge([
+                [Constants::CONFIG_KEY . '.' . 'private_key', null, 'incorrect'],
+                [
+                    Constants::CONFIG_KEY . '.' . 'public_key',
+                    null,
+                    'BBp2ZSrnNp5GLBbBvu9kXPzKXgcSo8XyZXNLjBBuXky-IpzCZSSLyfhTKLPpo3UnlF6UBWgjzrg_cs3f6AqVTD4',
+                ],
+            ])));
+
+        $this->expectException(InvalidPrivateKeyException::class);
+
+        $this->subject->sendMessage($this->message, $this->subscription);
+    }
+
+    public function testThatIncorrectPublicKeyWillThrowException()
+    {
+        $this->config_repository
+            ->method('get')
+            ->will($this->returnValueMap(array_merge([
+                [Constants::CONFIG_KEY . '.' . 'private_key', null, 'RofDYZ1GFp-oPDdvXVKN29yl1xKfJUPjTWYKQkcUuJU'],
+                [Constants::CONFIG_KEY . '.' . 'public_key', null, 'incorrect'],
+            ])));
+
+        $this->expectException(InvalidPublicKeyException::class);
 
         $this->subject->sendMessage($this->message, $this->subscription);
     }
