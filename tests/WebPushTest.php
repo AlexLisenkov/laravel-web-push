@@ -97,14 +97,14 @@ class WebPushTest extends TestCase
     {
         $this->config_repository
             ->method('get')
-            ->will($this->returnValueMap(array_merge([
+            ->willReturnMap(array_merge([
                 [Constants::CONFIG_KEY . '.' . 'private_key', null, 'RofDYZ1GFp-oPDdvXVKN29yl1xKfJUPjTWYKQkcUuJU'],
                 [
                     Constants::CONFIG_KEY . '.' . 'public_key',
                     null,
                     'BBp2ZSrnNp5GLBbBvu9kXPzKXgcSo8XyZXNLjBBuXky-IpzCZSSLyfhTKLPpo3UnlF6UBWgjzrg_cs3f6AqVTD4',
                 ],
-            ], $with)));
+            ], $with));
     }
 
     public function testSendMessageJWTGeneratorWillUseAudienceFromSubscription()
@@ -463,14 +463,14 @@ class WebPushTest extends TestCase
     {
         $this->config_repository
             ->method('get')
-            ->will($this->returnValueMap(array_merge([
+            ->willReturnMap(array_merge([
                 [Constants::CONFIG_KEY . '.' . 'private_key', null, 'incorrect'],
                 [
                     Constants::CONFIG_KEY . '.' . 'public_key',
                     null,
                     'BBp2ZSrnNp5GLBbBvu9kXPzKXgcSo8XyZXNLjBBuXky-IpzCZSSLyfhTKLPpo3UnlF6UBWgjzrg_cs3f6AqVTD4',
                 ],
-            ])));
+            ]));
 
         $this->expectException(InvalidPrivateKeyException::class);
 
@@ -481,10 +481,10 @@ class WebPushTest extends TestCase
     {
         $this->config_repository
             ->method('get')
-            ->will($this->returnValueMap(array_merge([
+            ->willReturnMap(array_merge([
                 [Constants::CONFIG_KEY . '.' . 'private_key', null, 'RofDYZ1GFp-oPDdvXVKN29yl1xKfJUPjTWYKQkcUuJU'],
                 [Constants::CONFIG_KEY . '.' . 'public_key', null, 'incorrect'],
-            ])));
+            ]));
 
         $this->expectException(InvalidPublicKeyException::class);
 
@@ -510,7 +510,11 @@ class WebPushTest extends TestCase
 
         $this->encrypted_message = $this->createMock(P256EncryptedMessageContract::class);
 
-        $this->subject = new WebPush($this->config_repository, $this->encrypted_message_builder, $this->JWT_generator,
-            $this->client);
+        $this->subject = new WebPush(
+            $this->config_repository,
+            $this->encrypted_message_builder,
+            $this->JWT_generator,
+            $this->client
+        );
     }
 }

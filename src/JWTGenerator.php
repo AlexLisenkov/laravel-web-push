@@ -164,18 +164,19 @@ class JWTGenerator implements JWTGeneratorContract
      */
     private function unserializePublicKey(string $data): array
     {
-        $first_byte = mb_strcut($data, 0, 1);
+        $data = bin2hex($data);
+        $first_byte = mb_substr($data, 0, 2, '8bit');
 
-        if ($first_byte !== "\x04") {
+        if ($first_byte !== '04') {
             throw new \InvalidArgumentException('Invalid data: only uncompressed keys are supported.');
         }
 
-        $data = mb_strcut($data, 1);
+        $data = mb_substr($data, 2, null, '8bit');
         $center = mb_strlen($data) / 2;
 
         return [
-            'x' => mb_strcut($data, 0, $center),
-            'y' => mb_strcut($data, $center),
+            'x' => hex2bin(mb_substr($data, 0, $center, '8bit')),
+            'y' => hex2bin(mb_substr($data, $center, null, '8bit')),
         ];
     }
 

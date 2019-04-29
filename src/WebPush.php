@@ -129,7 +129,7 @@ class WebPush implements WebPushContract
             $private_key_decoded = Base64Url::decode($private);
         } catch (\InvalidArgumentException $exception) {
             return false;
-        };
+        }
 
         return mb_strlen($private_key_decoded, '8bit') === 32;
     }
@@ -147,7 +147,7 @@ class WebPush implements WebPushContract
             $public_key_decoded = Base64Url::decode($public);
         } catch (\InvalidArgumentException $exception) {
             return false;
-        };
+        }
 
         return mb_strlen($public_key_decoded, '8bit') === 65;
     }
