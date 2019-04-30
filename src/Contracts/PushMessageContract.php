@@ -179,7 +179,7 @@ interface PushMessageContract extends Jsonable, Arrayable, \JsonSerializable
     /**
      * @return array
      */
-    public function toArray();
+    public function toArray(): array;
 
     /**
      * @param int $options

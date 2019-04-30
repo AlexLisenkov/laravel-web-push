@@ -16,7 +16,7 @@ class LaravelWebPushServiceProvider extends ServiceProvider
      *
      * @return void
      */
-    public function boot()
+    public function boot(): void
     {
         $this->app->bind(WebPushContract::class, WebPush::class);
         $this->app->bind(P256EncryptedMessageBuilderContract::class, P256EncryptedMessageBuilder::class);

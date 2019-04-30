@@ -15,6 +15,7 @@ namespace AlexLisenkov\LaravelWebPush\Tests {
     use Illuminate\Contracts\Config\Repository as ConfigRepository;
     use Orchestra\Testbench\TestCase;
     use PHPUnit\Framework\MockObject\MockObject;
+    use AlexLisenkov\LaravelWebPush\LaravelWebPushServiceProvider;
 
     class JWTGeneratorTest extends TestCase
     {
@@ -23,7 +24,7 @@ namespace AlexLisenkov\LaravelWebPush\Tests {
         /** @var JWTGenerator */
         private $subject;
 
-        public function testGetHeaderIsJWTES256Header()
+        public function testGetHeaderIsJWTES256Header(): void
         {
             $expected = [
                 'typ' => 'JWT',
@@ -35,31 +36,31 @@ namespace AlexLisenkov\LaravelWebPush\Tests {
             $this->assertSame($expected, $actual);
         }
 
-        public function testThatGetPayloadWillContainSetAudience()
+        public function testThatGetPayloadWillContainSetAudience(): void
         {
             $expected = 'Audience';
 
             $this->subject->withAudience($expected);
             $this->subject->willExpireIn(0);
 
-            $result = json_decode($this->subject->getPayload());
+            $result = json_decode($this->subject->getPayload(), true);
 
             $this->assertSame($expected, $result->aud);
         }
 
-        public function testThatGetPayloadWillContainSetExpire()
+        public function testThatGetPayloadWillContainSetExpire(): void
         {
             $expected = 3000;
 
             $this->subject->withAudience('Audience');
             $this->subject->willExpireIn(1000);
 
-            $result = json_decode($this->subject->getPayload());
+            $result = json_decode($this->subject->getPayload(), true);
 
             $this->assertSame($expected, $result->exp);
         }
 
-        public function testThatGetPayloadWillUseExpireTimeFromConfigWhenNotSet()
+        public function testThatGetPayloadWillUseExpireTimeFromConfigWhenNotSet(): void
         {
             $expected = 4000;
 
@@ -68,12 +69,12 @@ namespace AlexLisenkov\LaravelWebPush\Tests {
 
             $this->subject->withAudience('Audience');
 
-            $result = json_decode($this->subject->getPayload());
+            $result = json_decode($this->subject->getPayload(), true);
 
             $this->assertSame($expected, $result->exp);
         }
 
-        public function testThatGetPayloadWillUseSubFromConfig()
+        public function testThatGetPayloadWillUseSubFromConfig(): void
         {
             $expected = 'mailto:alex@create.nl';
 
@@ -83,12 +84,12 @@ namespace AlexLisenkov\LaravelWebPush\Tests {
             $this->subject->withAudience('Audience');
             $this->subject->willExpireIn(10);
 
-            $result = json_decode($this->subject->getPayload());
+            $result = json_decode($this->subject->getPayload(), true);
 
             $this->assertSame($expected, $result->sub);
         }
 
-        public function testThatGetJwkKtyEqualsEC()
+        public function testThatGetJwkKtyEqualsEC(): void
         {
             $this->config_repository
                 ->method('get')
@@ -100,7 +101,7 @@ namespace AlexLisenkov\LaravelWebPush\Tests {
             $this->assertSame('EC', $this->subject->getJWK()->get('kty'));
         }
 
-        public function testThatGetJwkCrvEqualsP256()
+        public function testThatGetJwkCrvEqualsP256(): void
         {
             $this->config_repository
                 ->method('get')
@@ -112,7 +113,7 @@ namespace AlexLisenkov\LaravelWebPush\Tests {
             $this->assertSame('P-256', $this->subject->getJWK()->get('crv'));
         }
 
-        public function testThatGetJwkXWillBeFirstPartOfPublicKey()
+        public function testThatGetJwkXWillBeFirstPartOfPublicKey(): void
         {
             $expected = 'GnZlKuc2nkYsFsG-72Rc_MpeBxKjxfJlcw';
 
@@ -126,7 +127,7 @@ namespace AlexLisenkov\LaravelWebPush\Tests {
             $this->assertSame($expected, $this->subject->getJWK()->get('x'));
         }
 
-        public function testThatGetJwkYWillBeFirstPartOfPublicKey()
+        public function testThatGetJwkYWillBeFirstPartOfPublicKey(): void
         {
             $expected = 'S4wQbl5MviKcwmUki8n4Uyiz6aN1J5RelAVoI864P3LN3-gKlUw-';
 
@@ -140,7 +141,7 @@ namespace AlexLisenkov\LaravelWebPush\Tests {
             $this->assertSame($expected, $this->subject->getJWK()->get('y'));
         }
 
-        public function testThatGetJwkDWillBeFirstPartOfPublicKey()
+        public function testThatGetJwkDWillBeFirstPartOfPublicKey(): void
         {
             $expected = 'WnThrKeXC_D00FRSITmGAvXGNHlIm3n4zqsvIHIOGMw';
 
@@ -154,7 +155,7 @@ namespace AlexLisenkov\LaravelWebPush\Tests {
             $this->assertSame($expected, $this->subject->getJWK()->get('d'));
         }
 
-        public function testGetJWSHasCorrectPayload()
+        public function testGetJWSHasCorrectPayload(): void
         {
             $this->subject->withAudience('test');
             $this->subject->willExpireIn(12);
@@ -170,7 +171,7 @@ namespace AlexLisenkov\LaravelWebPush\Tests {
             $this->assertSame('{"aud":"test","exp":2012,"sub":"subject"}', $this->subject->getJWS()->getPayload());
         }
 
-        public function testGetJWSHasOnlyOneSignature()
+        public function testGetJWSHasOnlyOneSignature(): void
         {
             $this->subject->withAudience('test');
             $this->subject->willExpireIn(12);
@@ -186,14 +187,14 @@ namespace AlexLisenkov\LaravelWebPush\Tests {
             $this->assertSame(1, $this->subject->getJWS()->countSignatures());
         }
 
-        public function testThatGetPayloadWithoutAudienceSetWillThrowException()
+        public function testThatGetPayloadWithoutAudienceSetWillThrowException(): void
         {
             $this->expectException(\Exception::class);
 
             $this->subject->getPayload();
         }
 
-        public function testThatGetJwkWithInvalidPublicKeyWillThrowException()
+        public function testThatGetJwkWithInvalidPublicKeyWillThrowException(): void
         {
             $this->expectException(\InvalidArgumentException::class);
 
@@ -206,14 +207,14 @@ namespace AlexLisenkov\LaravelWebPush\Tests {
             $this->subject->getJWK();
         }
 
-        public function testWillExpireAt()
+        public function testWillExpireAt(): void
         {
             $this->subject->willExpireAt(12345);
 
             $this->assertEquals(12345, $this->subject->getExpiresAt());
         }
 
-        public function testSerialize()
+        public function testSerialize(): void
         {
             $this->subject->withAudience('test');
             $this->subject->willExpireIn(12);
@@ -231,12 +232,12 @@ namespace AlexLisenkov\LaravelWebPush\Tests {
             $this->assertEquals(179, strlen($res));
         }
 
-        protected function getPackageProviders($app)
+        protected function getPackageProviders($app): array
         {
-            return ['AlexLisenkov\LaravelWebPush\LaravelWebPushServiceProvider'];
+            return [LaravelWebPushServiceProvider::class];
         }
 
-        protected function setUp()
+        protected function setUp(): void
         {
             parent::setUp();
 

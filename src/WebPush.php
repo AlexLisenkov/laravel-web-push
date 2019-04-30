@@ -9,6 +9,7 @@ use AlexLisenkov\LaravelWebPush\Contracts\PushSubscriptionContract;
 use AlexLisenkov\LaravelWebPush\Contracts\WebPushContract;
 use AlexLisenkov\LaravelWebPush\Exceptions\InvalidPrivateKeyException;
 use AlexLisenkov\LaravelWebPush\Exceptions\InvalidPublicKeyException;
+use AlexLisenkov\LaravelWebPush\Exceptions\MessageSerializationException;
 use Base64Url\Base64Url;
 use GuzzleHttp\Client;
 use GuzzleHttp\Promise\PromiseInterface;
@@ -54,28 +55,33 @@ class WebPush implements WebPushContract
         $this->client = $client;
     }
 
+    /**
+     * @param PushMessageContract $message
+     * @param PushSubscriptionContract $push_subscription
+     *
+     * @return PromiseInterface
+     * @throws MessageSerializationException
+     */
     public function sendMessage(
         PushMessageContract $message,
         PushSubscriptionContract $push_subscription
     ): PromiseInterface {
-        $private = $this->getConfigVariable('private_key');
-        if (!$this->assertPrivateKeyIsCorrect($private)) {
-            throw new InvalidPrivateKeyException('Configured private key is incorrect');
-        }
-
-        $public = $this->getConfigVariable('public_key');
-        if (!$this->assertPublicKeyIsCorrect($public)) {
-            throw new InvalidPublicKeyException('Configured public key is incorrect');
-        }
+        $this->assertConfiguredKeysAreCorrect();
 
         if (!$this->assertPublicKeyIsCorrect($push_subscription->getP256dh())) {
             throw new InvalidPublicKeyException('Subscriber public key is invalid');
         }
 
+        $payload = $message->toJson();
+
+        if ($payload === false) {
+            throw new MessageSerializationException(get_class($message));
+        }
+
         $encryptedMessage = $this->encrypted_message_builder
             ->withPublicKey($push_subscription->getP256dh())
             ->withAuthToken($push_subscription->getAuth())
-            ->build($message->toJson());
+            ->build($payload);
 
         $jwt = $this->JWT_generator
             ->withAudience($push_subscription->getAudience())
@@ -102,6 +108,21 @@ class WebPush implements WebPushContract
         $request = new Request('POST', $push_subscription->getEndpoint(), $headers, $encryptedMessage->getCypher());
 
         return $this->client->sendAsync($request);
+    }
+
+    private function assertConfiguredKeysAreCorrect(): void
+    {
+        $private = $this->getConfigVariable('private_key');
+
+        if (!$this->assertPrivateKeyIsCorrect($private)) {
+            throw new InvalidPrivateKeyException('Configured private key is incorrect');
+        }
+
+        $public = $this->getConfigVariable('public_key');
+
+        if (!$this->assertPublicKeyIsCorrect($public)) {
+            throw new InvalidPublicKeyException('Configured public key is incorrect');
+        }
     }
 
     /**
