@@ -43,7 +43,7 @@ namespace AlexLisenkov\LaravelWebPush\Tests {
             $this->subject->withAudience($expected);
             $this->subject->willExpireIn(0);
 
-            $result = json_decode($this->subject->getPayload(), true);
+            $result = json_decode($this->subject->getPayload(), false);
 
             $this->assertSame($expected, $result->aud);
         }
@@ -55,7 +55,7 @@ namespace AlexLisenkov\LaravelWebPush\Tests {
             $this->subject->withAudience('Audience');
             $this->subject->willExpireIn(1000);
 
-            $result = json_decode($this->subject->getPayload(), true);
+            $result = json_decode($this->subject->getPayload(), false);
 
             $this->assertSame($expected, $result->exp);
         }
@@ -69,7 +69,7 @@ namespace AlexLisenkov\LaravelWebPush\Tests {
 
             $this->subject->withAudience('Audience');
 
-            $result = json_decode($this->subject->getPayload(), true);
+            $result = json_decode($this->subject->getPayload(), false);
 
             $this->assertSame($expected, $result->exp);
         }
@@ -84,7 +84,7 @@ namespace AlexLisenkov\LaravelWebPush\Tests {
             $this->subject->withAudience('Audience');
             $this->subject->willExpireIn(10);
 
-            $result = json_decode($this->subject->getPayload(), true);
+            $result = json_decode($this->subject->getPayload(), false);
 
             $this->assertSame($expected, $result->sub);
         }
@@ -115,7 +115,7 @@ namespace AlexLisenkov\LaravelWebPush\Tests {
 
         public function testThatGetJwkXWillBeFirstPartOfPublicKey(): void
         {
-            $expected = 'GnZlKuc2nkYsFsG-72Rc_MpeBxKjxfJlcw';
+            $expected = 'GnZlKuc2nkYsFsG-72Rc_MpeBxKjxfJlc0uMEG5eTL4';
 
             $this->config_repository
                 ->method('get')
@@ -129,7 +129,7 @@ namespace AlexLisenkov\LaravelWebPush\Tests {
 
         public function testThatGetJwkYWillBeFirstPartOfPublicKey(): void
         {
-            $expected = 'S4wQbl5MviKcwmUki8n4Uyiz6aN1J5RelAVoI864P3LN3-gKlUw-';
+            $expected = 'IpzCZSSLyfhTKLPpo3UnlF6UBWgjzrg_cs3f6AqVTD4';
 
             $this->config_repository
                 ->method('get')

@@ -9,6 +9,9 @@ use AlexLisenkov\LaravelWebPush\Contracts\WebPushContract;
 use Elliptic\EC;
 use Illuminate\Support\ServiceProvider;
 
+/**
+ * @codeCoverageIgnore
+ */
 class LaravelWebPushServiceProvider extends ServiceProvider
 {
     /**

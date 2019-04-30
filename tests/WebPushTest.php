@@ -9,6 +9,7 @@ use AlexLisenkov\LaravelWebPush\Contracts\PushMessageContract;
 use AlexLisenkov\LaravelWebPush\Contracts\PushSubscriptionContract;
 use AlexLisenkov\LaravelWebPush\Exceptions\InvalidPrivateKeyException;
 use AlexLisenkov\LaravelWebPush\Exceptions\InvalidPublicKeyException;
+use AlexLisenkov\LaravelWebPush\Exceptions\MessageSerializationException;
 use GuzzleHttp\Client;
 use GuzzleHttp\ClientInterface;
 use GuzzleHttp\Promise\PromiseInterface;
@@ -16,6 +17,7 @@ use GuzzleHttp\Psr7\Request;
 use Illuminate\Contracts\Config\Repository as ConfigRepository;
 use Orchestra\Testbench\TestCase;
 use PHPUnit\Framework\MockObject\MockObject;
+use AlexLisenkov\LaravelWebPush\LaravelWebPushServiceProvider;
 
 class WebPushTest extends TestCase
 {
@@ -459,6 +461,25 @@ class WebPushTest extends TestCase
         $this->subject->sendMessage($this->message, $this->subscription);
     }
 
+    public function testThatFailedToJsonWillThrowException(): void
+    {
+        $this->setGetConfigVariableMock();
+
+        $p256 = 'BBp2ZSrnNp5GLBbBvu9kXPzKXgcSo8XyZXNLjBBuXky-IpzCZSSLyfhTKLPpo3UnlF6UBWgjzrg_cs3f6AqVTD4';
+        $this->subscription
+            ->method('getP256dh')
+            ->willReturn($p256);
+
+        $this->message
+            ->expects($this->once())
+            ->method('toJson')
+            ->willReturn(false);
+
+        $this->expectException(MessageSerializationException::class);
+
+        $this->subject->sendMessage($this->message, $this->subscription);
+    }
+
     public function testThatIncorrectPrivateKeyWillThrowException(): void
     {
         $this->config_repository
@@ -491,9 +512,9 @@ class WebPushTest extends TestCase
         $this->subject->sendMessage($this->message, $this->subscription);
     }
 
-    protected function getPackageProviders($app)
+    protected function getPackageProviders($app): array
     {
-        return ['AlexLisenkov\LaravelWebPush\LaravelWebPushServiceProvider'];
+        return [LaravelWebPushServiceProvider::class];
     }
 
     protected function setUp(): void
