@@ -18,28 +18,28 @@ class PushSubscriptionTest extends TestCase
      */
     private $subject;
 
-    public function testIfGetEndpointIsInitialEndpoint()
+    public function testIfGetEndpointIsInitialEndpoint(): void
     {
         $actual = $this->subject->getEndpoint();
 
         $this->assertSame($this->endpoint, $actual);
     }
 
-    public function testIfGetP256dhIsInitialP256dh()
+    public function testIfGetP256dhIsInitialP256dh(): void
     {
         $actual = $this->subject->getP256dh();
 
         $this->assertSame($this->p256dh, $actual);
     }
 
-    public function testIfGetAuthIsInitialAuth()
+    public function testIfGetAuthIsInitialAuth(): void
     {
         $actual = $this->subject->getAuth();
 
         $this->assertSame($this->auth, $actual);
     }
 
-    public function testIfSetEndpointWillUpdateEndpoint()
+    public function testIfSetEndpointWillUpdateEndpoint(): void
     {
         $expected = 'new endpoint';
         $this->subject->setEndpoint($expected);
@@ -48,7 +48,7 @@ class PushSubscriptionTest extends TestCase
         $this->assertSame($expected, $actual);
     }
 
-    public function testIfSetP256dhWillUpdateP256dh()
+    public function testIfSetP256dhWillUpdateP256dh(): void
     {
         $expected = 'new p256';
         $this->subject->setP256dh($expected);
@@ -57,7 +57,7 @@ class PushSubscriptionTest extends TestCase
         $this->assertSame($expected, $actual);
     }
 
-    public function testIfSetAuthWillUpdateAuth()
+    public function testIfSetAuthWillUpdateAuth(): void
     {
         $expected = 'new auth';
         $this->subject->setAuth($expected);
@@ -66,7 +66,7 @@ class PushSubscriptionTest extends TestCase
         $this->assertSame($expected, $actual);
     }
 
-    public function testGetAudience()
+    public function testGetAudience(): void
     {
         $expected = 'https://example.com';
         $actual = $this->subject->getAudience();
@@ -74,7 +74,7 @@ class PushSubscriptionTest extends TestCase
         $this->assertSame($expected, $actual);
     }
 
-    public function testSendMessage()
+    public function testSendMessage(): void
     {
         $message = $this->createMock(PushMessageContract::class);
         $promise = $this->createMock(PromiseInterface::class);
@@ -93,12 +93,12 @@ class PushSubscriptionTest extends TestCase
         $this->subject->sendMessage($message);
     }
 
-    protected function getPackageProviders($app)
+    protected function getPackageProviders($app): array
     {
-        return ['AlexLisenkov\LaravelWebPush\LaravelWebPushServiceProvider'];
+        return [LaravelWebPushServiceProvider::class];
     }
 
-    protected function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
 

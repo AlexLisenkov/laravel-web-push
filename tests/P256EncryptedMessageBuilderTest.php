@@ -24,21 +24,21 @@ class P256EncryptedMessageBuilderTest extends TestCase
      */
     private $subject;
 
-    public function testThatWithPublicKeyWillReturnSelf()
+    public function testThatWithPublicKeyWillReturnSelf(): void
     {
         $actual = $this->subject->withPublicKey('');
 
         $this->assertInstanceOf(P256EncryptedMessageBuilder::class, $actual);
     }
 
-    public function testThatWithAuthTokenWillReturnSelf()
+    public function testThatWithAuthTokenWillReturnSelf(): void
     {
         $actual = $this->subject->withAuthToken('');
 
         $this->assertInstanceOf(P256EncryptedMessageBuilder::class, $actual);
     }
 
-    public function testThatBuildWillBuildP256EncryptedMessageContract()
+    public function testThatBuildWillBuildP256EncryptedMessageContract(): void
     {
         $this->setAuthTokenAndPublicKey();
         $this->ec->method('keyFromPublic')->willReturn(new EC\KeyPair('', ''));
@@ -53,13 +53,13 @@ class P256EncryptedMessageBuilderTest extends TestCase
         $this->subject->build('anything');
     }
 
-    private function setAuthTokenAndPublicKey()
+    private function setAuthTokenAndPublicKey(): void
     {
         $this->subject->withAuthToken('auth');
         $this->subject->withPublicKey('BBp2ZSrnNp5GLBbBvu9kXPzKXgcSo8XyZXNLjBBuXky-IpzCZSSLyfhTKLPpo3UnlF6UBWgjzrg_cs3f6AqVTD4');
     }
 
-    public function testThatPrivateParameterIsGeneratedKeyPair()
+    public function testThatPrivateParameterIsGeneratedKeyPair(): void
     {
         $expected = new EC\KeyPair('', '');
 
@@ -80,7 +80,7 @@ class P256EncryptedMessageBuilderTest extends TestCase
         $this->subject->build('anything');
     }
 
-    public function testThatSubscriberParameterIsGeneratedKeyPair()
+    public function testThatSubscriberParameterIsGeneratedKeyPair(): void
     {
         $expected = new EC\KeyPair('', '');
 
@@ -101,7 +101,7 @@ class P256EncryptedMessageBuilderTest extends TestCase
         $this->subject->build('anything');
     }
 
-    public function testThatAuthTokenIsDecodedAuthToken()
+    public function testThatAuthTokenIsDecodedAuthToken(): void
     {
         $expected = Base64Url::decode('auth');
 
@@ -122,7 +122,7 @@ class P256EncryptedMessageBuilderTest extends TestCase
         $this->subject->build('anything');
     }
 
-    public function testThatSaltSizeIsExactlyToTheDefinedConstant()
+    public function testThatSaltSizeIsExactlyToTheDefinedConstant(): void
     {
         $expected = Constants::SALT_BYTE_LENGTH;
 
@@ -143,7 +143,7 @@ class P256EncryptedMessageBuilderTest extends TestCase
         $this->subject->build('anything');
     }
 
-    public function testThatPayloadIsSameAsGiven()
+    public function testThatPayloadIsSameAsGiven(): void
     {
         $expected = '{payload: true}';
 
@@ -164,7 +164,7 @@ class P256EncryptedMessageBuilderTest extends TestCase
         $this->subject->build($expected);
     }
 
-    public function testThatPublicECIsGeneratedFromGivenPublicKey()
+    public function testThatPublicECIsGeneratedFromGivenPublicKey(): void
     {
         $expected = bin2hex(Base64Url::decode('BBp2ZSrnNp5GLBbBvu9kXPzKXgcSo8XyZXNLjBBuXky-IpzCZSSLyfhTKLPpo3UnlF6UBWgjzrg_cs3f6AqVTD4'));
 
@@ -185,7 +185,7 @@ class P256EncryptedMessageBuilderTest extends TestCase
         $this->subject->build('anything');
     }
 
-    protected function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
 
@@ -194,8 +194,8 @@ class P256EncryptedMessageBuilderTest extends TestCase
         $this->subject = new P256EncryptedMessageBuilder($this->ec, $this->container);
     }
 
-    protected function getPackageProviders($app)
+    protected function getPackageProviders($app): array
     {
-        return ['AlexLisenkov\LaravelWebPush\LaravelWebPushServiceProvider'];
+        return [LaravelWebPushServiceProvider::class];
     }
 }

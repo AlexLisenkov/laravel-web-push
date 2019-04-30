@@ -315,7 +315,7 @@ abstract class PushMessage implements PushMessageContract
     /**
      * @return array
      */
-    public function toArray()
+    public function toArray(): array
     {
         return array_filter([
             'title' => $this->getTitle(),
@@ -342,11 +342,15 @@ abstract class PushMessage implements PushMessageContract
     }
 
     /**
-     * @return false|string
+     * @return string
      */
-    public function __toString()
+    public function __toString(): string
     {
-        return $this->toJson();
+        if( $string = $this->toJson() ){
+            return (string) $string;
+        }
+
+        return '';
     }
 
     /**

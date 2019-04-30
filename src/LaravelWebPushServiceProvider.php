@@ -9,6 +9,9 @@ use AlexLisenkov\LaravelWebPush\Contracts\WebPushContract;
 use Elliptic\EC;
 use Illuminate\Support\ServiceProvider;
 
+/**
+ * @codeCoverageIgnore
+ */
 class LaravelWebPushServiceProvider extends ServiceProvider
 {
     /**
@@ -16,7 +19,7 @@ class LaravelWebPushServiceProvider extends ServiceProvider
      *
      * @return void
      */
-    public function boot()
+    public function boot(): void
     {
         $this->app->bind(WebPushContract::class, WebPush::class);
         $this->app->bind(P256EncryptedMessageBuilderContract::class, P256EncryptedMessageBuilder::class);

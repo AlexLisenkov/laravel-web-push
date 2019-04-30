@@ -9,6 +9,7 @@ use AlexLisenkov\LaravelWebPush\Contracts\PushMessageContract;
 use AlexLisenkov\LaravelWebPush\Contracts\PushSubscriptionContract;
 use AlexLisenkov\LaravelWebPush\Exceptions\InvalidPrivateKeyException;
 use AlexLisenkov\LaravelWebPush\Exceptions\InvalidPublicKeyException;
+use AlexLisenkov\LaravelWebPush\Exceptions\MessageSerializationException;
 use GuzzleHttp\Client;
 use GuzzleHttp\ClientInterface;
 use GuzzleHttp\Promise\PromiseInterface;
@@ -16,6 +17,7 @@ use GuzzleHttp\Psr7\Request;
 use Illuminate\Contracts\Config\Repository as ConfigRepository;
 use Orchestra\Testbench\TestCase;
 use PHPUnit\Framework\MockObject\MockObject;
+use AlexLisenkov\LaravelWebPush\LaravelWebPushServiceProvider;
 
 class WebPushTest extends TestCase
 {
@@ -52,7 +54,7 @@ class WebPushTest extends TestCase
      */
     private $subject;
 
-    public function testSendMessageBuildsEncryptedMessageFromSubscription()
+    public function testSendMessageBuildsEncryptedMessageFromSubscription(): void
     {
         $this->setGetConfigVariableMock();
 
@@ -93,7 +95,7 @@ class WebPushTest extends TestCase
         $this->subject->sendMessage($this->message, $this->subscription);
     }
 
-    private function setGetConfigVariableMock(array $with = [])
+    private function setGetConfigVariableMock(array $with = []): void
     {
         $this->config_repository
             ->method('get')
@@ -107,7 +109,7 @@ class WebPushTest extends TestCase
             ], $with));
     }
 
-    public function testSendMessageJWTGeneratorWillUseAudienceFromSubscription()
+    public function testSendMessageJWTGeneratorWillUseAudienceFromSubscription(): void
     {
         $this->setGetConfigVariableMock();
         $this->setEncryptedMessageBuilderMocks();
@@ -134,7 +136,7 @@ class WebPushTest extends TestCase
         $this->subject->sendMessage($this->message, $this->subscription);
     }
 
-    private function setEncryptedMessageBuilderMocks()
+    private function setEncryptedMessageBuilderMocks(): void
     {
         $this->setGetConfigVariableMock();
         $p256 = 'BBp2ZSrnNp5GLBbBvu9kXPzKXgcSo8XyZXNLjBBuXky-IpzCZSSLyfhTKLPpo3UnlF6UBWgjzrg_cs3f6AqVTD4';
@@ -165,7 +167,7 @@ class WebPushTest extends TestCase
             ->willReturn($this->encrypted_message);
     }
 
-    public function testThatRequestMethodIsPost()
+    public function testThatRequestMethodIsPost(): void
     {
         $this->setGetConfigVariableMock();
         $this->setEncryptedMessageBuilderMocks();
@@ -183,7 +185,7 @@ class WebPushTest extends TestCase
         $this->subject->sendMessage($this->message, $this->subscription);
     }
 
-    private function setJWTGeneratorMocks()
+    private function setJWTGeneratorMocks(): void
     {
         $audience = 'https://example.net';
         $this->subscription
@@ -199,7 +201,7 @@ class WebPushTest extends TestCase
             ->willReturn('serialized string');
     }
 
-    public function testThatRequestUriIsSubscriptionEndpoint()
+    public function testThatRequestUriIsSubscriptionEndpoint(): void
     {
         $endpoint = 'https://example.net/endpoint';
 
@@ -224,7 +226,7 @@ class WebPushTest extends TestCase
         $this->subject->sendMessage($this->message, $this->subscription);
     }
 
-    public function testThatRequestBodyIsMessageCypher()
+    public function testThatRequestBodyIsMessageCypher(): void
     {
         $cypher = '1234459696959592373737';
 
@@ -249,7 +251,7 @@ class WebPushTest extends TestCase
         $this->subject->sendMessage($this->message, $this->subscription);
     }
 
-    public function testThatRequestContentTypeHeaderIsApplicationOctetStream()
+    public function testThatRequestContentTypeHeaderIsApplicationOctetStream(): void
     {
         $this->setGetConfigVariableMock();
         $this->setEncryptedMessageBuilderMocks();
@@ -267,7 +269,7 @@ class WebPushTest extends TestCase
         $this->subject->sendMessage($this->message, $this->subscription);
     }
 
-    public function testThatRequestContentEncodingHeaderIsAesgcm()
+    public function testThatRequestContentEncodingHeaderIsAesgcm(): void
     {
         $this->setGetConfigVariableMock();
         $this->setEncryptedMessageBuilderMocks();
@@ -285,7 +287,7 @@ class WebPushTest extends TestCase
         $this->subject->sendMessage($this->message, $this->subscription);
     }
 
-    public function testThatRequestAuthorizationHeaderIsWebpushWithJWT()
+    public function testThatRequestAuthorizationHeaderIsWebpushWithJWT(): void
     {
         $this->setGetConfigVariableMock();
         $this->setEncryptedMessageBuilderMocks();
@@ -303,7 +305,7 @@ class WebPushTest extends TestCase
         $this->subject->sendMessage($this->message, $this->subscription);
     }
 
-    public function testThatRequestEncryptionHeaderIsEncodedSalt()
+    public function testThatRequestEncryptionHeaderIsEncodedSalt(): void
     {
         $expected = 'Salted potato chips';
 
@@ -328,7 +330,7 @@ class WebPushTest extends TestCase
         $this->subject->sendMessage($this->message, $this->subscription);
     }
 
-    public function testThatRequestCryptoKeyHeaderIsEncodedPublicKeyAndPublicKey()
+    public function testThatRequestCryptoKeyHeaderIsEncodedPublicKeyAndPublicKey(): void
     {
         $expected_message_pub_key = 'BBp2ZSrnNp5GLBbBvu9kXPzKXgcSo8XyZXNLjBBuXky-IpzCZSSLyfhTKLPpo3UnlF6UBWgjzrg_cs3f6AqVTD4';
         $expected_config_pub_key = 'BBp2ZSrnNp5GLBbBvu9kXPzKXgcSo8XyZXNLjBBuXky-IpzCZSSLyfhTKLPpo3UnlF6UBWgjzrg_cs3f6AqVTD4';
@@ -362,7 +364,7 @@ class WebPushTest extends TestCase
         $this->subject->sendMessage($this->message, $this->subscription);
     }
 
-    public function testThatRequestContentLengthHeaderIsCypherLength()
+    public function testThatRequestContentLengthHeaderIsCypherLength(): void
     {
         $expected = 12345;
 
@@ -387,7 +389,7 @@ class WebPushTest extends TestCase
         $this->subject->sendMessage($this->message, $this->subscription);
     }
 
-    public function testThatRequestTTLHeaderIsConfiguredTTL()
+    public function testThatRequestTTLHeaderIsConfiguredTTL(): void
     {
         $expected = 50000;
 
@@ -409,7 +411,7 @@ class WebPushTest extends TestCase
         $this->subject->sendMessage($this->message, $this->subscription);
     }
 
-    public function testThatRequestTopicHeaderIsMessageTopic()
+    public function testThatRequestTopicHeaderIsMessageTopic(): void
     {
         $expected = 'topic';
 
@@ -434,7 +436,7 @@ class WebPushTest extends TestCase
         $this->subject->sendMessage($this->message, $this->subscription);
     }
 
-    public function testThatRequestUrgencyHeaderIsMessageUrgency()
+    public function testThatRequestUrgencyHeaderIsMessageUrgency(): void
     {
         $expected = 'high';
 
@@ -459,7 +461,26 @@ class WebPushTest extends TestCase
         $this->subject->sendMessage($this->message, $this->subscription);
     }
 
-    public function testThatIncorrectPrivateKeyWillThrowException()
+    public function testThatFailedToJsonWillThrowException(): void
+    {
+        $this->setGetConfigVariableMock();
+
+        $p256 = 'BBp2ZSrnNp5GLBbBvu9kXPzKXgcSo8XyZXNLjBBuXky-IpzCZSSLyfhTKLPpo3UnlF6UBWgjzrg_cs3f6AqVTD4';
+        $this->subscription
+            ->method('getP256dh')
+            ->willReturn($p256);
+
+        $this->message
+            ->expects($this->once())
+            ->method('toJson')
+            ->willReturn(false);
+
+        $this->expectException(MessageSerializationException::class);
+
+        $this->subject->sendMessage($this->message, $this->subscription);
+    }
+
+    public function testThatIncorrectPrivateKeyWillThrowException(): void
     {
         $this->config_repository
             ->method('get')
@@ -477,7 +498,7 @@ class WebPushTest extends TestCase
         $this->subject->sendMessage($this->message, $this->subscription);
     }
 
-    public function testThatIncorrectPublicKeyWillThrowException()
+    public function testThatIncorrectPublicKeyWillThrowException(): void
     {
         $this->config_repository
             ->method('get')
@@ -491,12 +512,12 @@ class WebPushTest extends TestCase
         $this->subject->sendMessage($this->message, $this->subscription);
     }
 
-    protected function getPackageProviders($app)
+    protected function getPackageProviders($app): array
     {
-        return ['AlexLisenkov\LaravelWebPush\LaravelWebPushServiceProvider'];
+        return [LaravelWebPushServiceProvider::class];
     }
 
-    protected function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
 

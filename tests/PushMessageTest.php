@@ -7,6 +7,7 @@ use AlexLisenkov\LaravelWebPush\Contracts\WebPushContract;
 use GuzzleHttp\Promise\PromiseInterface;
 use Illuminate\Support\Facades\App;
 use Orchestra\Testbench\TestCase;
+use AlexLisenkov\LaravelWebPush\LaravelWebPushServiceProvider;
 
 class PushMessageTest extends TestCase
 {
@@ -15,7 +16,7 @@ class PushMessageTest extends TestCase
      */
     private $subject;
 
-    public function testSendTo()
+    public function testSendTo(): void
     {
         $subscription = $this->createMock(PushSubscriptionContract::class);
         $promise = $this->createMock(PromiseInterface::class);
@@ -34,7 +35,7 @@ class PushMessageTest extends TestCase
         $this->subject->sendTo($subscription);
     }
 
-    public function testTitle()
+    public function testTitle(): void
     {
         $expected = 'Title';
 
@@ -43,7 +44,7 @@ class PushMessageTest extends TestCase
         $this->assertSame($expected, $this->subject->getTitle());
     }
 
-    public function testBody()
+    public function testBody(): void
     {
         $expected = 'Body';
 
@@ -52,7 +53,7 @@ class PushMessageTest extends TestCase
         $this->assertSame($expected, $this->subject->getBody());
     }
 
-    public function testIconPath()
+    public function testIconPath(): void
     {
         $expected = 'https://example.com';
 
@@ -61,7 +62,7 @@ class PushMessageTest extends TestCase
         $this->assertSame($expected, $this->subject->getIconPath());
     }
 
-    public function testUrgency()
+    public function testUrgency(): void
     {
         $expected = 'urgent';
 
@@ -70,7 +71,7 @@ class PushMessageTest extends TestCase
         $this->assertSame($expected, $this->subject->getUrgency());
     }
 
-    public function testTopic()
+    public function testTopic(): void
     {
         $expected = 'topic';
 
@@ -79,7 +80,7 @@ class PushMessageTest extends TestCase
         $this->assertSame($expected, $this->subject->getTopic());
     }
 
-    public function testTag()
+    public function testTag(): void
     {
         $expected = 'tag';
 
@@ -88,7 +89,7 @@ class PushMessageTest extends TestCase
         $this->assertSame($expected, $this->subject->getTag());
     }
 
-    public function testVibrationPattern()
+    public function testVibrationPattern(): void
     {
         $expected = [1, 3, 5];
 
@@ -97,7 +98,7 @@ class PushMessageTest extends TestCase
         $this->assertSame($expected, $this->subject->getVibrationPattern());
     }
 
-    public function testTimestamp()
+    public function testTimestamp(): void
     {
         $expected = 12345;
 
@@ -106,7 +107,7 @@ class PushMessageTest extends TestCase
         $this->assertSame($expected, $this->subject->getTimestamp());
     }
 
-    public function testLang()
+    public function testLang(): void
     {
         $expected = 'nl';
 
@@ -115,7 +116,7 @@ class PushMessageTest extends TestCase
         $this->assertSame($expected, $this->subject->getLang());
     }
 
-    public function testSilent()
+    public function testSilent(): void
     {
         $expected = false;
 
@@ -124,7 +125,7 @@ class PushMessageTest extends TestCase
         $this->assertSame($expected, $this->subject->isSilent());
     }
 
-    public function testToArray()
+    public function testToArray(): void
     {
         $expected = [
             'title' => 'title',
@@ -151,7 +152,7 @@ class PushMessageTest extends TestCase
         $this->assertSame($expected, $this->subject->toArray());
     }
 
-    public function testToJson()
+    public function testToJson(): void
     {
         $expected = json_encode([
             'title' => 'title',
@@ -178,7 +179,7 @@ class PushMessageTest extends TestCase
         $this->assertSame($expected, $this->subject->toJson());
     }
 
-    public function testToString()
+    public function testToString(): void
     {
         $expected = json_encode([
             'title' => 'title',
@@ -205,7 +206,7 @@ class PushMessageTest extends TestCase
         $this->assertSame($expected, $this->subject->__toString());
     }
 
-    public function testJsonSerialize()
+    public function testJsonSerialize(): void
     {
         $expected = json_encode([
             'title' => 'title',
@@ -232,7 +233,7 @@ class PushMessageTest extends TestCase
         $this->assertSame($expected, $this->subject->jsonSerialize());
     }
 
-    public function testThatIfMessageIsSilentNoVibrationPatternExists()
+    public function testThatIfMessageIsSilentNoVibrationPatternExists(): void
     {
         $this->subject->setVibrationPattern([1, 2, 3])
                       ->setSilent(true);
@@ -242,7 +243,7 @@ class PushMessageTest extends TestCase
         $this->assertArrayNotHasKey('vibrate', $result);
     }
 
-    public function testThatIfMessageIsNotSilentVibrationPatternExists()
+    public function testThatIfMessageIsNotSilentVibrationPatternExists(): void
     {
         $this->subject->setVibrationPattern([1, 2, 3])
                       ->setSilent(false);
@@ -252,12 +253,12 @@ class PushMessageTest extends TestCase
         $this->assertArrayHasKey('vibrate', $result);
     }
 
-    protected function getPackageProviders($app)
+    protected function getPackageProviders($app): array
     {
-        return ['AlexLisenkov\LaravelWebPush\LaravelWebPushServiceProvider'];
+        return [LaravelWebPushServiceProvider::class];
     }
 
-    protected function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
 

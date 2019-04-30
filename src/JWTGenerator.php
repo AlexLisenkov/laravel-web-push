@@ -88,11 +88,12 @@ class JWTGenerator implements JWTGeneratorContract
     /**
      * @return string
      * @throws \InvalidArgumentException
+     * @throws \Exception
      */
     public function getPayload(): string
     {
-        if (!is_string($this->audience)) {
-            throw new \InvalidArgumentException("Audience must be string, " . gettype($this->audience) . " given.");
+        if( !$this->audience ){
+            throw new \Exception('No audience set');
         }
 
         if (!$this->getExpiresAt()) {
