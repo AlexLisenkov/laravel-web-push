@@ -249,7 +249,7 @@ class PushMessage implements PushMessageContract
      */
     private function mapActionsToArray(): ?array
     {
-        if (!is_array($this->getActions())) {
+        if ($this->getActions() === null) {
             return null;
         }
 
@@ -277,17 +277,22 @@ class PushMessage implements PushMessageContract
      *
      * @return PushMessage
      */
-    public function setActions(array $actions): PushMessage
+    public function setActions(?array $actions): PushMessage
+    {
+        $this->assertActionsImplementContract($actions ?? []);
+
+        $this->actions = $actions;
+
+        return $this;
+    }
+
+    private function assertActionsImplementContract($actions): void
     {
         foreach ($actions as $action) {
             if (!$action instanceof MessageActionContract) {
                 throw new \InvalidArgumentException(get_class($action) . ' must implement ' . MessageActionContract::class);
             }
         }
-
-        $this->actions = $actions;
-
-        return $this;
     }
 
     /**
@@ -381,7 +386,7 @@ class PushMessage implements PushMessageContract
      */
     public function setDir(string $dir): PushMessage
     {
-        if (!array_has(self::NOTIFICATION_DIRECTIONS, $dir)) {
+        if (!in_array($dir, self::NOTIFICATION_DIRECTIONS, true)) {
             throw new \InvalidArgumentException('Direction must be one of ' . implode(', ',
                     self::NOTIFICATION_DIRECTIONS));
         }

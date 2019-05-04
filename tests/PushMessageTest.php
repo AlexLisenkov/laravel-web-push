@@ -52,6 +52,94 @@ class PushMessageTest extends TestCase
         $this->assertSame($expected, $this->subject->getBody());
     }
 
+    public function testBadge(): void
+    {
+        $expected = 'badge';
+
+        $this->subject->setBadge($expected);
+
+        $this->assertSame($expected, $this->subject->getBadge());
+    }
+
+    public function testData(): void
+    {
+        $expected = [1, 2, 3];
+
+        $this->subject->setData($expected);
+
+        $this->assertSame($expected, $this->subject->getData());
+    }
+
+    public function testDirDefaultsToAuto(): void
+    {
+        $this->assertSame('auto', $this->subject->getDir());
+    }
+
+    public function testDirAuto(): void
+    {
+        $this->subject->setDir('auto');
+
+        $this->assertSame('auto', $this->subject->getDir());
+    }
+
+    public function testDirLtr(): void
+    {
+        $this->subject->setDir('ltr');
+
+        $this->assertSame('ltr', $this->subject->getDir());
+    }
+
+    public function testDirRtl(): void
+    {
+        $this->subject->setDir('rtl');
+
+        $this->assertSame('rtl', $this->subject->getDir());
+    }
+
+    public function testDirWithInvalidValueWillThrowException()
+    {
+        $this->expectException(\InvalidArgumentException::class);
+
+        $this->subject->setDir('invalid');
+    }
+
+    public function testImage(): void
+    {
+        $expected = 'https://example.com';
+
+        $this->subject->setImage($expected);
+
+        $this->assertSame($expected, $this->subject->getImage());
+    }
+
+    public function testRenotifyDefaultsToFalse(): void
+    {
+        $this->assertFalse($this->subject->getRenotify());
+    }
+
+    public function testRenotify(): void
+    {
+        $expected = true;
+
+        $this->subject->setRenotify($expected);
+
+        $this->assertSame($expected, $this->subject->getRenotify());
+    }
+
+    public function testRequireInteractionDefaultsToFalse(): void
+    {
+        $this->assertFalse($this->subject->getRequireInteraction());
+    }
+
+    public function testRequireInteraction(): void
+    {
+        $expected = true;
+
+        $this->subject->setRequireInteraction($expected);
+
+        $this->assertSame($expected, $this->subject->getRequireInteraction());
+    }
+
     public function testIconPath(): void
     {
         $expected = 'https://example.com';
@@ -254,6 +342,60 @@ class PushMessageTest extends TestCase
         $result = $this->subject->toArray();
 
         $this->assertArrayHasKey('vibrate', $result['options']);
+    }
+
+    public function testThatMapActionsToArrayWithNoActionsWillReturnNull(): void
+    {
+        $this->subject->setActions(null);
+
+        $result = $this->subject->toArray();
+
+        $this->assertArrayNotHasKey('actions', $result['options']);
+    }
+
+    public function testThatMapActionsToArrayWithEmptyActionsWillReturnNull(): void
+    {
+        $this->subject->setActions([]);
+
+        $result = $this->subject->toArray();
+
+        $this->assertArrayNotHasKey('actions', $result['options']);
+    }
+
+    public function testThatMapActionsToArrayWitActionsWillReturnArray(): void
+    {
+        $this->subject->setActions([
+            new class extends MessageAction
+            {
+                protected $action = 'test action';
+                protected $title = 'test title';
+            },
+        ]);
+
+        $result = $this->subject->toArray();
+
+        $this->assertArrayHasKey('actions', $result['options']);
+        $this->assertSame([[
+            'action' => 'test action',
+            'title' => 'test title',
+            'icon' => null,
+        ]], $result['options']['actions']);
+    }
+
+    public function testThatSetActionsWithNullWillSetNull(): void
+    {
+        $this->subject->setActions(null);
+
+        $this->assertNull($this->subject->getActions());
+    }
+
+    public function testThatSetActionsWithIncorrectClassWillThrowException(): void
+    {
+        $this->expectException(\InvalidArgumentException::class);
+
+        $this->subject->setActions([
+            new class{}
+        ]);
     }
 
     protected function getPackageProviders($app): array

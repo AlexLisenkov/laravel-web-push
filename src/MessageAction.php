@@ -4,7 +4,7 @@ namespace AlexLisenkov\LaravelWebPush;
 
 use AlexLisenkov\LaravelWebPush\Contracts\MessageActionContract;
 
-abstract class MessageAction implements MessageActionContract
+class MessageAction implements MessageActionContract
 {
     /**
      * A DOMString identifying a user action to be displayed on the notification.
@@ -104,7 +104,7 @@ abstract class MessageAction implements MessageActionContract
      *
      * @return array
      */
-    public function toArray()
+    public function toArray(): array
     {
         return [
             'action' => $this->getAction(),
