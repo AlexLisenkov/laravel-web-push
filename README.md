@@ -165,3 +165,29 @@ self.addEventListener('push', function(e) {
     self.registration.showNotification(data.title, data.options);
 });
 ```
+## Testing
+
+``` bash
+$ composer test
+```
+
+## Security
+
+If you discover any security related issues, please email alex@create.nl instead of using the issue tracker.
+
+## Contributing
+
+Contributions are welcome.
+
+- [PSR-2 coding standards](https://github.com/php-fig/fig-standards/blob/master/accepted/PSR-2-coding-style-guide.md)
+- Keep the project tested
+- Keep your pull requests small and limited
+
+## Credits
+
+- [Alex Lisenkov](https://github.com/alexlisenkov)
+- [All Contributors](../../contributors)
+
+## License
+
+The MIT License (MIT). Please see [License File](LICENSE.md) for more information.

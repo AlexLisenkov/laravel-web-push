@@ -35,5 +35,8 @@
                 "AlexLisenkov\\LaravelWebPush\\LaravelWebPushServiceProvider"
             ]
         }
+    },
+    "scripts": {
+        "test": "vendor/bin/phpunit"
     }
 }
