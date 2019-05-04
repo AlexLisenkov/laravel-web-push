@@ -49,7 +49,7 @@ return [
 
 ## Creating a message
 A message can be created by creating a new class that extends the `AlexLisenkov\LaravelWebPush\PushMessage` class.
-Please see [this MDN doc](https://developer.mozilla.org/en-US/docs/Web/API/ServiceWorkerRegistration/showNotification#Parameters) to see all available options.
+Please see [this MDN doc](https://developer.mozilla.org/en-US/docs/Web/API/ServiceWorkerRegistration/showNotification#Parameters) or the [Living Standards](https://notifications.spec.whatwg.org/#dictdef-notificationoptions) to see all available options.
 ```php
 <?php
 
