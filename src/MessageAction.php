@@ -130,11 +130,7 @@ class MessageAction implements MessageActionContract
      */
     public function __toString(): string
     {
-        if( $string = $this->toJson() ){
-            return (string) $string;
-        }
-
-        return '';
+        return (string) $this->toJson();
     }
 
     /**
