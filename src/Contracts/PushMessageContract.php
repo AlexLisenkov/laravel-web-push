@@ -5,8 +5,10 @@ namespace AlexLisenkov\LaravelWebPush\Contracts;
 
 use AlexLisenkov\LaravelWebPush\PushMessage;
 use GuzzleHttp\Promise\PromiseInterface;
+use Illuminate\Contracts\Support\Arrayable;
+use Illuminate\Contracts\Support\Jsonable;
 
-interface PushMessageContract
+interface PushMessageContract extends Jsonable, Arrayable, \JsonSerializable
 {
     /**
      * @param PushSubscriptionContract $push_subscription
