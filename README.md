@@ -7,7 +7,7 @@
 [![More info](https://developers.google.com/web/fundamentals/push-notifications/images/svgs/server-to-push-service.svg)](https://developers.google.com/web/fundamentals/push-notifications/web-push-protocol)
 
 The `alexlisenkov/laravel-web-push` package is a package to send push notifications.
-This package offers you to send notifications quickly by creating your message and subscriptions.
+Send out push messages as a standalone package. Use this if you dont work with laravel notification channels.
 
 If you are new to the Web Push Protocol please [read about the fundamentals](https://developers.google.com/web/fundamentals/push-notifications/web-push-protocol).
 
@@ -47,9 +47,51 @@ return [
 
 # Sending a Web Push
 
-## Creating a message
+## Quick guide
+A message can be created by creating a new `AlexLisenkov\LaravelWebPush\PushMessage` class.
+
+Please see [this MDN doc](https://developer.mozilla.org/en-US/docs/Web/API/ServiceWorkerRegistration/showNotification#Parameters) or the [Living Standards](https://notifications.spec.whatwg.org/#dictdef-notificationoptions) to see all available options.
+```php
+<?php
+
+namespace App\Http\Controllers;
+
+use Illuminate\Http\Response;
+use AlexLisenkov\LaravelWebPush\PushMessage;
+use AlexLisenkov\LaravelWebPush\PushSubscription;
+
+class PushMessageController
+{
+    public function sendPushMessage(): Response
+    {
+        // Create a subscription
+        $subscription = new PushSubscription(
+            "endpoint",
+            "p256dh",
+            "auth"
+        );
+        
+        // Create a message
+        $message = new PushMessage();
+        $message->setTitle('Hello World');
+        $message->setBody('This message is sent using web push');
+        $message->setIcon('https://placekitten.com/75/75');
+        
+        // We can either use the message to send it to a subscription
+        $message->sendTo($subscription)->wait();
+        
+        // Or send the subscription a message
+        $subscription->sendMessage($message)->wait();
+        
+        return response('ok');
+    }
+}
+
+```
+
+## Creating message objects
 A message can be created by creating a new class that extends the `AlexLisenkov\LaravelWebPush\PushMessage` class.
-Please see [this MDN doc](https://developer.mozilla.org/en-US/docs/Web/API/ServiceWorkerRegistration/showNotification#Parameters) to see all available options.
+Please see [this MDN doc](https://developer.mozilla.org/en-US/docs/Web/API/ServiceWorkerRegistration/showNotification#Parameters) or the [Living Standards](https://notifications.spec.whatwg.org/#dictdef-notificationoptions) to see all available options.
 ```php
 <?php
 
@@ -63,15 +105,19 @@ class ExampleMessage extends PushMessage
 
     protected $body = 'This message is sent using web push';
 
-    protected $iconPath = 'https://placekitten.com/75/75';
+    protected $icon = 'https://placekitten.com/75/75';
+    
+    // Or overwrite a getter
+    public function getData()
+    {
+        return User()->name;
+    }
 }
 
 ```
 
 ## Creating a subscription
 The `AlexLisenkov\LaravelWebPush\PushSubscription` is used to create a new subscription. 
-If you rather want to use your own class you can implement the `AlexLisenlov\LaravelWebPush\Contracts\PushSubscriptionContract`.
-
 ```php
 <?php
 use AlexLisenkov\LaravelWebPush\PushSubscription;
@@ -82,6 +128,9 @@ new PushSubscription(
         "auth"
     );
 ```
+
+It is also possible for you to implement `AlexLisenlov\LaravelWebPush\Contracts\PushSubscriptionContract` into any class. 
+For example on a model.
 
 ## Sending a notification
 Now that we have a subscriber and a message, we can send it out.
@@ -107,9 +156,38 @@ $message->sendTo($subscription);
 $subscription->sendMessage($message);
 ```
 
-# TODO:
-- Create a `SendsMessages` trait to use in combination with the `PushSubscriptionContract`
-- Messages should be able to implement `ShouldQueue` to send messages to queue
-- `PushMessage` is missing the [actions](https://developer.mozilla.org/en-US/docs/Web/API/ServiceWorkerRegistration/showNotification#Parameters) value, this should be added
-- Create more docs on how to use and install
-- Create exceptions for missing configuration variables
+## Service worker
+Show a notification to the subscriber by adding an event listener in your service worker.
+```js
+self.addEventListener('push', function(e) {
+    let data = e.data.json();
+    
+    self.registration.showNotification(data.title, data.options);
+});
+```
+## Testing
+
+``` bash
+$ composer test
+```
+
+## Security
+
+If you discover any security related issues, please email alex@create.nl instead of using the issue tracker.
+
+## Contributing
+
+Contributions are welcome.
+
+- [PSR-2 coding standards](https://github.com/php-fig/fig-standards/blob/master/accepted/PSR-2-coding-style-guide.md)
+- Keep the project tested
+- Keep your pull requests small and limited
+
+## Credits
+
+- [Alex Lisenkov](https://github.com/alexlisenkov)
+- [All Contributors](../../contributors)
+
+## License
+
+The MIT License (MIT). Please see [License File](LICENSE) for more information.

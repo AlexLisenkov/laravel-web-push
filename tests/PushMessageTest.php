@@ -7,7 +7,6 @@ use AlexLisenkov\LaravelWebPush\Contracts\WebPushContract;
 use GuzzleHttp\Promise\PromiseInterface;
 use Illuminate\Support\Facades\App;
 use Orchestra\Testbench\TestCase;
-use AlexLisenkov\LaravelWebPush\LaravelWebPushServiceProvider;
 
 class PushMessageTest extends TestCase
 {
@@ -53,13 +52,101 @@ class PushMessageTest extends TestCase
         $this->assertSame($expected, $this->subject->getBody());
     }
 
+    public function testBadge(): void
+    {
+        $expected = 'badge';
+
+        $this->subject->setBadge($expected);
+
+        $this->assertSame($expected, $this->subject->getBadge());
+    }
+
+    public function testData(): void
+    {
+        $expected = [1, 2, 3];
+
+        $this->subject->setData($expected);
+
+        $this->assertSame($expected, $this->subject->getData());
+    }
+
+    public function testDirDefaultsToAuto(): void
+    {
+        $this->assertSame('auto', $this->subject->getDir());
+    }
+
+    public function testDirAuto(): void
+    {
+        $this->subject->setDir('auto');
+
+        $this->assertSame('auto', $this->subject->getDir());
+    }
+
+    public function testDirLtr(): void
+    {
+        $this->subject->setDir('ltr');
+
+        $this->assertSame('ltr', $this->subject->getDir());
+    }
+
+    public function testDirRtl(): void
+    {
+        $this->subject->setDir('rtl');
+
+        $this->assertSame('rtl', $this->subject->getDir());
+    }
+
+    public function testDirWithInvalidValueWillThrowException()
+    {
+        $this->expectException(\InvalidArgumentException::class);
+
+        $this->subject->setDir('invalid');
+    }
+
+    public function testImage(): void
+    {
+        $expected = 'https://example.com';
+
+        $this->subject->setImage($expected);
+
+        $this->assertSame($expected, $this->subject->getImage());
+    }
+
+    public function testRenotifyDefaultsToFalse(): void
+    {
+        $this->assertFalse($this->subject->getRenotify());
+    }
+
+    public function testRenotify(): void
+    {
+        $expected = true;
+
+        $this->subject->setRenotify($expected);
+
+        $this->assertSame($expected, $this->subject->getRenotify());
+    }
+
+    public function testRequireInteractionDefaultsToFalse(): void
+    {
+        $this->assertFalse($this->subject->getRequireInteraction());
+    }
+
+    public function testRequireInteraction(): void
+    {
+        $expected = true;
+
+        $this->subject->setRequireInteraction($expected);
+
+        $this->assertSame($expected, $this->subject->getRequireInteraction());
+    }
+
     public function testIconPath(): void
     {
         $expected = 'https://example.com';
 
-        $this->subject->setIconPath($expected);
+        $this->subject->setIcon($expected);
 
-        $this->assertSame($expected, $this->subject->getIconPath());
+        $this->assertSame($expected, $this->subject->getIcon());
     }
 
     public function testUrgency(): void
@@ -93,9 +180,9 @@ class PushMessageTest extends TestCase
     {
         $expected = [1, 3, 5];
 
-        $this->subject->setVibrationPattern($expected);
+        $this->subject->setVibrate($expected);
 
-        $this->assertSame($expected, $this->subject->getVibrationPattern());
+        $this->assertSame($expected, $this->subject->getVibrate());
     }
 
     public function testTimestamp(): void
@@ -129,23 +216,24 @@ class PushMessageTest extends TestCase
     {
         $expected = [
             'title' => 'title',
-            'body' => 'body',
-            'icon' => 'example',
-            'urgency' => 'high',
-            'topic' => 'topic',
-            'tag' => 'test',
-            'vibrate' => [1, 2, 3],
-            'timestamp' => 12345,
-            'lang' => 'nl',
+            'options' => [
+                'body' => 'body',
+                'dir' => 'auto',
+                'icon' => 'example',
+                'lang' => 'nl',
+                'tag' => 'test',
+                'timestamp' => 12345,
+                'vibrate' => [1, 2, 3],
+            ],
         ];
 
         $this->subject->setTitle('title')
                       ->setBody('body')
-                      ->setIconPath('example')
+                      ->setIcon('example')
                       ->setUrgency('high')
                       ->setTopic('topic')
                       ->setTag('test')
-                      ->setVibrationPattern([1, 2, 3])
+                      ->setVibrate([1, 2, 3])
                       ->setTimestamp(12345)
                       ->setLang('nl');
 
@@ -156,23 +244,24 @@ class PushMessageTest extends TestCase
     {
         $expected = json_encode([
             'title' => 'title',
-            'body' => 'body',
-            'icon' => 'example',
-            'urgency' => 'high',
-            'topic' => 'topic',
-            'tag' => 'test',
-            'vibrate' => [1, 2, 3],
-            'timestamp' => 12345,
-            'lang' => 'nl',
+            'options' => [
+                'body' => 'body',
+                'dir' => 'auto',
+                'icon' => 'example',
+                'lang' => 'nl',
+                'tag' => 'test',
+                'timestamp' => 12345,
+                'vibrate' => [1, 2, 3],
+            ],
         ]);
 
         $this->subject->setTitle('title')
                       ->setBody('body')
-                      ->setIconPath('example')
+                      ->setIcon('example')
                       ->setUrgency('high')
                       ->setTopic('topic')
                       ->setTag('test')
-                      ->setVibrationPattern([1, 2, 3])
+                      ->setVibrate([1, 2, 3])
                       ->setTimestamp(12345)
                       ->setLang('nl');
 
@@ -183,23 +272,24 @@ class PushMessageTest extends TestCase
     {
         $expected = json_encode([
             'title' => 'title',
-            'body' => 'body',
-            'icon' => 'example',
-            'urgency' => 'high',
-            'topic' => 'topic',
-            'tag' => 'test',
-            'vibrate' => [1, 2, 3],
-            'timestamp' => 12345,
-            'lang' => 'nl',
+            'options' => [
+                'body' => 'body',
+                'dir' => 'auto',
+                'icon' => 'example',
+                'lang' => 'nl',
+                'tag' => 'test',
+                'timestamp' => 12345,
+                'vibrate' => [1, 2, 3],
+            ],
         ]);
 
         $this->subject->setTitle('title')
                       ->setBody('body')
-                      ->setIconPath('example')
+                      ->setIcon('example')
                       ->setUrgency('high')
                       ->setTopic('topic')
                       ->setTag('test')
-                      ->setVibrationPattern([1, 2, 3])
+                      ->setVibrate([1, 2, 3])
                       ->setTimestamp(12345)
                       ->setLang('nl');
 
@@ -210,23 +300,24 @@ class PushMessageTest extends TestCase
     {
         $expected = json_encode([
             'title' => 'title',
-            'body' => 'body',
-            'icon' => 'example',
-            'urgency' => 'high',
-            'topic' => 'topic',
-            'tag' => 'test',
-            'vibrate' => [1, 2, 3],
-            'timestamp' => 12345,
-            'lang' => 'nl',
+            'options' => [
+                'body' => 'body',
+                'dir' => 'auto',
+                'icon' => 'example',
+                'lang' => 'nl',
+                'tag' => 'test',
+                'timestamp' => 12345,
+                'vibrate' => [1, 2, 3],
+            ],
         ]);
 
         $this->subject->setTitle('title')
                       ->setBody('body')
-                      ->setIconPath('example')
+                      ->setIcon('example')
                       ->setUrgency('high')
                       ->setTopic('topic')
                       ->setTag('test')
-                      ->setVibrationPattern([1, 2, 3])
+                      ->setVibrate([1, 2, 3])
                       ->setTimestamp(12345)
                       ->setLang('nl');
 
@@ -235,22 +326,76 @@ class PushMessageTest extends TestCase
 
     public function testThatIfMessageIsSilentNoVibrationPatternExists(): void
     {
-        $this->subject->setVibrationPattern([1, 2, 3])
+        $this->subject->setVibrate([1, 2, 3])
                       ->setSilent(true);
 
         $result = $this->subject->toArray();
 
-        $this->assertArrayNotHasKey('vibrate', $result);
+        $this->assertArrayNotHasKey('vibrate', $result['options']);
     }
 
     public function testThatIfMessageIsNotSilentVibrationPatternExists(): void
     {
-        $this->subject->setVibrationPattern([1, 2, 3])
+        $this->subject->setVibrate([1, 2, 3])
                       ->setSilent(false);
 
         $result = $this->subject->toArray();
 
-        $this->assertArrayHasKey('vibrate', $result);
+        $this->assertArrayHasKey('vibrate', $result['options']);
+    }
+
+    public function testThatMapActionsToArrayWithNoActionsWillReturnNull(): void
+    {
+        $this->subject->setActions(null);
+
+        $result = $this->subject->toArray();
+
+        $this->assertArrayNotHasKey('actions', $result['options']);
+    }
+
+    public function testThatMapActionsToArrayWithEmptyActionsWillReturnNull(): void
+    {
+        $this->subject->setActions([]);
+
+        $result = $this->subject->toArray();
+
+        $this->assertArrayNotHasKey('actions', $result['options']);
+    }
+
+    public function testThatMapActionsToArrayWitActionsWillReturnArray(): void
+    {
+        $this->subject->setActions([
+            new class extends MessageAction
+            {
+                protected $action = 'test action';
+                protected $title = 'test title';
+            },
+        ]);
+
+        $result = $this->subject->toArray();
+
+        $this->assertArrayHasKey('actions', $result['options']);
+        $this->assertSame([[
+            'action' => 'test action',
+            'title' => 'test title',
+            'icon' => null,
+        ]], $result['options']['actions']);
+    }
+
+    public function testThatSetActionsWithNullWillSetNull(): void
+    {
+        $this->subject->setActions(null);
+
+        $this->assertNull($this->subject->getActions());
+    }
+
+    public function testThatSetActionsWithIncorrectClassWillThrowException(): void
+    {
+        $this->expectException(\InvalidArgumentException::class);
+
+        $this->subject->setActions([
+            new class{}
+        ]);
     }
 
     protected function getPackageProviders($app): array
@@ -262,9 +407,7 @@ class PushMessageTest extends TestCase
     {
         parent::setUp();
 
-        $this->subject = new class extends PushMessage
-        {
-        };
+        $this->subject = new PushMessage();
     }
 
 }
