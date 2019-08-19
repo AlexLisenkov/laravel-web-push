@@ -97,7 +97,7 @@ class PushSubscription implements PushSubscriptionContract
      */
     public function getAudience(): string
     {
-        $audience = new Request('', $this->getEndpoint());
+        $audience = new Request('get', $this->getEndpoint());
 
         return $audience->getUri()->getScheme() . '://' . $audience->getUri()->getHost();
     }
