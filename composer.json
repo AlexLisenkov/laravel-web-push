@@ -26,7 +26,7 @@
     },
     "require-dev": {
         "roave/security-advisories": "dev-master",
-        "phpunit/phpunit": "^7.4",
+        "phpunit/phpunit": "^8.3",
         "orchestra/testbench": "~3.7"
     },
     "extra": {
