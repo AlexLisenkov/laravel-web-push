@@ -11,12 +11,11 @@ matrix:
 
 before_script:
   - travis_retry composer self-update
-  - travis_retry composer update --no-interaction --prefer-source
-  - if [[ $OLDPHPUNIT == true ]]; then composer require "phpunit/phpunit:6.5"; fi
+  - travis_retry composer update --no-interaction --prefer-source --ignore-platform-reqs
+  - if [ $OLDPHPUNIT == true ]; then composer require "phpunit/phpunit:6.5"; fi
 
 script:
-  - if [[ $OLDPHPUNIT == true ]]; then ./vendor/bin/phpunit; fi
-  - if [[ $OLDPHPUNIT != true ]]; phpunit --coverage-text --coverage-clover=coverage.clover; fi
+  - ./vendor/bin/phpunit --coverage-text --coverage-clover=coverage.clover
 
 after_success:
   - bash <(curl -s https://codecov.io/bash)
