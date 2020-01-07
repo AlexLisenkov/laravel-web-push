@@ -4,9 +4,10 @@ namespace AlexLisenkov\LaravelWebPush;
 
 use AlexLisenkov\LaravelWebPush\Contracts\JWTGeneratorContract;
 use Base64Url\Base64Url;
+use Exception;
 use Illuminate\Contracts\Config\Repository as ConfigRepository;
+use InvalidArgumentException;
 use Jose\Component\Core\AlgorithmManager;
-use Jose\Component\Core\Converter\StandardConverter;
 use Jose\Component\Core\JWK;
 use Jose\Component\Signature\Algorithm\ES256;
 use Jose\Component\Signature\JWS;
@@ -59,24 +60,22 @@ class JWTGenerator implements JWTGeneratorContract
 
     /**
      * @return string
-     * @throws \Exception
+     * @throws Exception
      */
     public function serialize(): string
     {
-        $jsonConverter = new StandardConverter();
-        $jwsCompactSerializer = new CompactSerializer($jsonConverter);
+        $jwsCompactSerializer = new CompactSerializer();
 
         return $jwsCompactSerializer->serialize($this->getJWS(), 0);
     }
 
     /**
      * @return JWS
-     * @throws \Exception
+     * @throws Exception
      */
     public function getJWS(): JWS
     {
-        $jsonConverter = new StandardConverter();
-        $jwsBuilder = new JWSBuilder($jsonConverter, AlgorithmManager::create([new ES256()]));
+        $jwsBuilder = new JWSBuilder(new AlgorithmManager([new ES256()]));
 
         return $jwsBuilder
             ->create()
@@ -87,13 +86,13 @@ class JWTGenerator implements JWTGeneratorContract
 
     /**
      * @return string
-     * @throws \InvalidArgumentException
-     * @throws \Exception
+     * @throws InvalidArgumentException
+     * @throws Exception
      */
     public function getPayload(): string
     {
-        if( !$this->audience ){
-            throw new \Exception('No audience set');
+        if (!$this->audience) {
+            throw new Exception('No audience set');
         }
 
         if (!$this->getExpiresAt()) {
@@ -149,7 +148,7 @@ class JWTGenerator implements JWTGeneratorContract
         $local_server_key = Base64Url::decode($this->getConfigVariable('public_key'));
         $public = $this->unserializePublicKey($local_server_key);
 
-        return JWK::create([
+        return new JWK([
             'kty' => 'EC',
             'crv' => 'P-256',
             'x' => Base64Url::encode($public['x']),
@@ -169,7 +168,7 @@ class JWTGenerator implements JWTGeneratorContract
         $first_byte = mb_substr($data, 0, 2, '8bit');
 
         if ($first_byte !== '04') {
-            throw new \InvalidArgumentException('Invalid data: only uncompressed keys are supported.');
+            throw new InvalidArgumentException('Invalid data: only uncompressed keys are supported.');
         }
 
         $data = mb_substr($data, 2, null, '8bit');
