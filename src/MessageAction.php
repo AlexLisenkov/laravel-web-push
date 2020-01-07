@@ -28,6 +28,40 @@ class MessageAction implements MessageActionContract
     protected $icon;
 
     /**
+     * @return string
+     */
+    public function __toString(): string
+    {
+        return (string)$this->toJson();
+    }
+
+    /**
+     * Convert the object to its JSON representation.
+     *
+     * @param int $options
+     *
+     * @return false|string
+     */
+    public function toJson($options = PushMessage::DEFAULT_ENCODING_OPTIONS)
+    {
+        return json_encode($this->toArray(), $options);
+    }
+
+    /**
+     * Get the instance as an array.
+     *
+     * @return array
+     */
+    public function toArray(): array
+    {
+        return [
+            'action' => $this->getAction(),
+            'title' => $this->getTitle(),
+            'icon' => $this->getIcon(),
+        ];
+    }
+
+    /**
      * Get Action
      *
      * @return string
@@ -97,40 +131,6 @@ class MessageAction implements MessageActionContract
         $this->icon = $icon;
 
         return $this;
-    }
-
-    /**
-     * Get the instance as an array.
-     *
-     * @return array
-     */
-    public function toArray(): array
-    {
-        return [
-            'action' => $this->getAction(),
-            'title' => $this->getTitle(),
-            'icon' => $this->getIcon(),
-        ];
-    }
-
-    /**
-     * Convert the object to its JSON representation.
-     *
-     * @param int $options
-     *
-     * @return false|string
-     */
-    public function toJson($options = PushMessage::DEFAULT_ENCODING_OPTIONS)
-    {
-        return json_encode($this->toArray(), $options);
-    }
-
-    /**
-     * @return string
-     */
-    public function __toString(): string
-    {
-        return (string) $this->toJson();
     }
 
     /**

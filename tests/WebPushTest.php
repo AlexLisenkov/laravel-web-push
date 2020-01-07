@@ -17,7 +17,6 @@ use GuzzleHttp\Psr7\Request;
 use Illuminate\Contracts\Config\Repository as ConfigRepository;
 use Orchestra\Testbench\TestCase;
 use PHPUnit\Framework\MockObject\MockObject;
-use AlexLisenkov\LaravelWebPush\LaravelWebPushServiceProvider;
 
 class WebPushTest extends TestCase
 {
