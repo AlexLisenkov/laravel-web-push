@@ -1,8 +1,7 @@
 # Send Push Notification in Laravel
 [![Total Downloads](https://poser.pugx.org/alexlisenkov/laravel-web-push/downloads)](https://packagist.org/packages/alexlisenkov/laravel-web-push)
-[![Scrutinizer Code Quality](https://scrutinizer-ci.com/g/AlexLisenkov/laravel-web-push/badges/quality-score.png?b=master)](https://scrutinizer-ci.com/g/AlexLisenkov/laravel-web-push/?branch=master)
-[![Code Coverage](https://scrutinizer-ci.com/g/AlexLisenkov/laravel-web-push/badges/coverage.png?b=master)](https://scrutinizer-ci.com/g/AlexLisenkov/laravel-web-push/?branch=master)
-[![build](https://travis-ci.org/AlexLisenkov/laravel-web-push.svg?branch=master)](https://travis-ci.org/AlexLisenkov/laravel-web-push)
+[![Coverage Status](https://coveralls.io/repos/github/AlexLisenkov/laravel-web-push/badge.svg?branch=master)](https://coveralls.io/github/AlexLisenkov/laravel-web-push?branch=master)
+![CI](https://github.com/AlexLisenkov/laravel-web-push/workflows/CI/badge.svg)
 
 [![More info](https://developers.google.com/web/fundamentals/push-notifications/images/svgs/server-to-push-service.svg)](https://developers.google.com/web/fundamentals/push-notifications/web-push-protocol)
 
@@ -107,7 +106,7 @@ class ExampleMessage extends PushMessage
 
     protected $icon = 'https://placekitten.com/75/75';
     
-    // Or overwrite a getter
+    // Or override a getter
     public function getData()
     {
         return User()->name;
