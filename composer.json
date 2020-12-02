@@ -15,19 +15,20 @@
         }
     },
     "require": {
+        "php": "^7.1",
         "simplito/elliptic-php": "^1.0",
         "spomky-labs/base64url": "^2.0",
         "ext-gmp": "*",
         "ext-openssl": "*",
         "ext-json": "*",
-        "guzzlehttp/guzzle": "^6.5",
-        "web-token/jwt-framework": "^2.1",
+        "guzzlehttp/guzzle": "^7.2",
+        "web-token/jwt-framework": "^2.2",
         "ext-mbstring": "*"
     },
     "require-dev": {
         "roave/security-advisories": "dev-master",
-        "phpunit/phpunit": "^8.5",
-        "orchestra/testbench": "~4.4"
+        "phpunit/phpunit": "^9.0",
+        "orchestra/testbench": "~4.6"
     },
     "extra": {
         "laravel": {
