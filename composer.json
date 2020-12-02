@@ -15,7 +15,7 @@
         }
     },
     "require": {
-        "php": "^7.2 | ^8.0",
+        "php": "^7.3 | ^8.0",
         "simplito/elliptic-php": "^1.0",
         "spomky-labs/base64url": "^2.0",
         "ext-gmp": "*",
